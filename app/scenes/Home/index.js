@@ -1,20 +1,15 @@
-import * as firebase from "firebase"
-
-import { Button, Container, Content, Text } from 'native-base'
+import * as firebase from 'firebase'
+import map from 'lodash/map'
+import colors from 'material-colors'
+import { Text } from 'native-base'
+import React, { Component } from 'react'
 import { InteractionManager, Platform, Slider, StyleSheet, View } from 'react-native'
-import React, {Component} from 'react'
-
 import I18n from 'react-native-i18n'
 import MapView from 'react-native-maps'
-import colors from 'material-colors'
+
 import doneIcon from '../../images/ic_save_white_24dp.png'
-import map from 'lodash/map'
 import plusIcon from '../../images/ic_add_white_24dp.png'
 import searchIcon from '../../images/ic_search_black_24dp.png'
-
-const navigatorButtons = {
-
-}
 
 class Home extends Component {
   static navigatorStyle = {
@@ -29,7 +24,7 @@ class Home extends Component {
         navBarTransparent: true,
         navBarButtonColor: 'red',
         drawUnderNavBar: true,
-        topBarElevationShadowEnabled: false,
+        topBarElevationShadowEnabled: false
       }
     })
   }
@@ -81,6 +76,17 @@ class Home extends Component {
     }
   }
 
+  componentWillUpdate (nextState) {
+    if (nextState.selectLocation) {
+      console.log('test update')
+      this.props.navigator.toggleTabs({
+        to: 'hidden',
+        animated: true
+      })
+    }
+  }
+
+
   componentDidMount () {
     InteractionManager.runAfterInteractions(() => {
       firebase.database().ref('/challenges').on('value', (snapshot) => {
@@ -118,20 +124,22 @@ class Home extends Component {
       screen: 'TAKE_PICTURE',
       navigatorStyle: {
         navBarHidden: true
+      },
+      passProps: {
+        onSelectLocationPress: this.selectLocationForChallenge.bind(this)
       }
     })
   }
 
   selectLocationForChallenge (challengeData) {
     console.log(challengeData)
-    if (Platform.OS === 'ios'){
-      this.props.navigator.dismissLightBox()
-    }else{
-      this.props.navigator.dismissModal()
-    }
     this.props.navigator.setTitle({ title: I18n.t('select_location') })
+
+    this.props.navigator.toggleNavBar({
+      to: 'hidden',
+      animated: true
+    })
     this.props.navigator.setButtons({
-      ...navigatorButtons,
       fab: {
         collapsedId: 'save_challenge',
         collapsedIcon: doneIcon,

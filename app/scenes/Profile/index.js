@@ -1,74 +1,97 @@
-import { Body, Button, Card, CardItem, Container, Content, Form, H2, H3, Input, Item, Label, ListItem, Row, Spinner, Text, Textarea } from 'native-base';
-import { Image, View } from 'react-native'
+/* @flow */
+import colors from 'material-colors'
+import { Button, Container, Content, H2, H3, Spinner, Text } from 'native-base'
+import { Image, StyleSheet } from 'react-native'
 import React, {Component} from 'react'
+import I18n from 'react-native-i18n'
 
 import Auth from '../../auth'
-import colors from 'material-colors'
 import { navigatorStyle } from '../../theme'
+import type { Profile } from '../../typedef'
 
-class Profile extends Component {
-  static navigatorStyle = navigatorStyle
+type ProfileProps = {
 
-  constructor () {
-    super()
-    this.auth = Auth
+}
+
+type ProfileState = {
+  profile: ?Profile,
+  profileLoaded: boolean
+}
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16
+  },
+  signOutButton: {
+    alignSelf: 'center',
+    marginTop: 16,
+    backgroundColor: colors.cyan['500']
+  },
+  profilePhoto: {
+    width: 80,
+    height: 80,
+    alignSelf: 'center',
+    borderRadius: 40
+  },
+  email: {
+    textAlign: 'center',
+    paddingVertical: 8
+  },
+  name: {
+    textAlign: 'center',
+    paddingVertical: 12,
+    fontWeight: 'bold'
   }
+})
+
+class ProfileScreen extends Component<void, ProfileProps, ProfileState> {
+  static navigatorStyle = navigatorStyle
 
   state = {
     profileLoaded: false,
-    profile: {}
+    profile: null
   }
 
-  componentDidMount () {
-    this.auth.getAuthData()
-    .then((authData) => {
-      // console.log('have auth data cdnnnn', authData)
-      this.setState({
-        profileLoaded: true,
-        profile: {
-          photo: this.getUserPhotoUrl(authData),
-          name: authData.user.name,
-          email: authData.user.email
-        }
-      })
+  componentDidMount (): void {
+    Auth.getProfile()
+    .then((profile: ?Profile): void => {
+      this.setState({ profileLoaded: true, profile })
     })
   }
 
-  signOut () {
-    this.auth.signOut()
+  signOut (): void {
+    Auth.signOut()
   }
 
-  getUserPhotoUrl (authData: Object) {
-    return authData.type === 'facebook' ? authData.user.picture.data.url : authData.user.photo
-  }
-
-  render () {
-      return (
-        <Container style={{ padding: 16 }}>
-          {this.state.profileLoaded
-          ? (
-            <Content>
-              <Image
-                source={{ uri: this.state.profile.photo }}
-                style={{ width: 80, height: 80, alignSelf: 'center', borderRadius: 40 }} />
-              <H2 style={{ textAlign: 'center', paddingVertical: 12, fontWeight: 'bold' }}>
-                {this.state.profile.name}
-              </H2>
-              <H3 style={{ textAlign: 'center', paddingVertical: 8 }}>
-                {this.state.profile.email}
-              </H3>
-              <Button
-                style={{ alignSelf: 'center', marginTop: 16, backgroundColor: colors.cyan['500'] }}
-                onPress={() => this.signOut()}>
-                <Text>Sign out</Text>
-              </Button>
-            </Content>
-          ) : (
-            <Spinner />
-          )}
-        </Container>
-      )
+  render (): Container {
+    return (
+      <Container style={StyleSheet.flatten(styles.container)}>
+        {this.state.profileLoaded && this.state.profile
+        ? (
+          <Content contentContainerStyle={{ alignItems: 'center' }}>
+            <Image
+              source={{ uri: this.state.profile.photo }}
+              style={StyleSheet.flatten(styles.profilePhoto)} />
+            <H2 style={StyleSheet.flatten(styles.name)}>
+              {this.state.profile.name}
+            </H2>
+            <H3 style={StyleSheet.flatten(styles.email)}>
+              {this.state.profile.email}
+            </H3>
+            <Button
+              style={StyleSheet.flatten(styles.signOutButton)}
+              onPress={() => this.signOut()}>
+              <Text>{I18n.t('sign_out')}</Text>
+            </Button>
+          </Content>
+        ) : (
+          <Spinner />
+        )}
+      </Container>
+    )
   }
 }
 
-export default Profile
+
+
+export default ProfileScreen
