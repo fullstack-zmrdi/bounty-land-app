@@ -1,5 +1,5 @@
 /* @flow */
-import { Body, Button, Card, CardItem, Container, Content, Form, H2, Input, Item, Label, Row, Text, Segment } from 'native-base';
+import { Body, Button, Card, CardItem, Container, ListItem, Radio, Content, Form, H2, Input, Item, Label, Row, Text } from 'native-base'
 import { Platform, View } from 'react-native'
 import React, {Component} from 'react'
 import map from 'lodash/map'
@@ -59,20 +59,7 @@ class AddChallenge extends Component<void, PropsType, StateType> {
         <CardItem header>
           <H2>{I18n.t('add_challenge')}</H2>
         </CardItem>
-        <Segment style={{ borderBottomWidth: 0 }}>
-          {map(CHALLENGE_CATEGORIES, (category, i) => {
-            return (
-              <Button
-                key={i}
-                first={i === CHALLENGE_CATEGORIES.garbage}
-                last={i === CHALLENGE_CATEGORIES.deeds}
-                active={this.state.category === category}
-                onPress={() => this.setState({ category })}>
-                <Text>{I18n.t(category)}</Text>
-              </Button>
-            )
-          })}
-        </Segment>
+
       </View>
     )
   }
@@ -83,7 +70,7 @@ class AddChallenge extends Component<void, PropsType, StateType> {
       <Content>
         <CardItem body>
           <Body>
-            <Form style={{ width: 240 }}>
+            <Form style={{ width: 260, alignSelf: 'center', flex: 1 }}>
               <Item floatingLabel style={{ marginBottom: 20, marginLeft: 0 }} >
                 <Label>{I18n.t('name')}</Label>
                 <Input
@@ -91,6 +78,17 @@ class AddChallenge extends Component<void, PropsType, StateType> {
                   value={this.state.name}
                   onChangeText={(val) => this.setState({ name: val })} />
               </Item>
+              {map(CHALLENGE_CATEGORIES, (category, i) => {
+                return (
+                  <ListItem
+                    key={i}
+                    onPress={() => this.setState({ category })}
+                    style={{ justifyContent: 'space-between', marginLeft: 0 }}>
+                    <Text style={{ overflow: 'hidden' }} numberOfLines={1} ellipsizeMode={'tail'}>{I18n.t(category)}</Text>
+                    <Radio selected={this.state.category === category} />
+                  </ListItem>
+                )
+              })}
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
                 <Item floatingLabel style={{ flex: 0.5, marginLeft: 0 }}>
                   <Label>{I18n.t('bounty')}</Label>

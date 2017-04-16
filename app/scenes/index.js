@@ -1,5 +1,8 @@
 import About from './About'
 import ChallengeDetail from './ChallengeDetail'
+import RaiseBountyModal from './ChallengeDetail/RaiseBounty'
+import ChallengeMessages from './ChallengeDetail/Messages'
+
 import Challenges from './Challenges'
 import Drawer from './Drawer'
 import Home from './Home'
@@ -27,6 +30,8 @@ export const registerScreens = () => {
   Navigation.registerComponent('CHALLENGE_ADDED', () => ChallengeAdded)
   Navigation.registerComponent('CAMERA_ROLL', () => CameraRoll)
   Navigation.registerComponent('CHALLENGE_DETAIL', () => ChallengeDetail)
+  Navigation.registerComponent('CHALLENGE_MESSAGES', () => ChallengeMessages)
+  Navigation.registerComponent('RAISE_BOUNTY', () => RaiseBountyModal)
   Navigation.registerComponent('CHALLENGES', () => Challenges)
   Navigation.registerComponent('WALLET', () => Wallet)
 }

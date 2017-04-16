@@ -3,7 +3,7 @@ import * as firebase from 'firebase'
 import map from 'lodash/map'
 import colors from 'material-colors'
 import React, { Component } from 'react'
-import { InteractionManager, Platform, StyleSheet, View } from 'react-native'
+import { InteractionManager, Platform, StyleSheet, View, StatusBar } from 'react-native'
 import I18n from 'react-native-i18n'
 import MapView from 'react-native-maps'
 
@@ -85,6 +85,8 @@ class Home extends Component<void, PropsType, StateType> {
   }
 
   componentDidMount () {
+        StatusBar.setBarStyle('dark-content', true)
+
     InteractionManager.runAfterInteractions(() => {
       firebase.database().ref('/challenges').on('value', (snapshot) => {
         this.setState({ challenges: snapshot.val() })
@@ -129,8 +131,7 @@ class Home extends Component<void, PropsType, StateType> {
   onChallengePress (challenge: Challenge): void {
     this.props.navigator.showModal({
       screen: 'CHALLENGE_DETAIL',
-      passProps: { challenge },
-      title: challenge.name
+      passProps: { challenge }
     })
   }
 

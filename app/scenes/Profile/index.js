@@ -7,7 +7,7 @@ import I18n from 'react-native-i18n'
 
 import Auth from '../../auth'
 import { navigatorStyle } from '../../theme'
-import type { Profile } from '../../typedef'
+import type { Profile, AuthData } from '../../typedef'
 
 type ProfileState = {
   profile: ?Profile,
@@ -53,6 +53,13 @@ class ProfileScreen extends Component<void, void, ProfileState> {
     .then((profile: ?Profile): void => {
       this.setState({ profileLoaded: true, profile })
     })
+
+    if (__DEV__) {
+      Auth.getAuthData()
+      .then((authData: ?AuthData): void => {
+        this.setState({ authData })
+      })
+    }
   }
 
   signOut (): void {
@@ -79,6 +86,12 @@ class ProfileScreen extends Component<void, void, ProfileState> {
               onPress={() => this.signOut()}>
               <Text>{I18n.t('sign_out')}</Text>
             </Button>
+            {__DEV__ && this.state.authData
+            ? (
+              <Text>
+                {JSON.stringify(this.state.authData, null, 4)}
+              </Text>
+            ) : null}
           </Content>
         ) : (
           <Spinner />

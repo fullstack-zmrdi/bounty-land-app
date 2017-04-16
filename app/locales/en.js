@@ -6,5 +6,21 @@ export default {
   share_on_facebook: 'Share on Facebook',
   challenge_map: 'Challenge map',
   done: 'Done',
-  challenge_added_summary: 'You\'ve just published challenge and gained {{points}} karma.'
+  challenge_added_summary: 'You\'ve just published challenge and gained {{points}} karma.',
+  toggle_description: 'Toggle description',
+  total_bounty: 'Total bounty',
+  challenger: 'Challenger',
+  deeds: 'Deeds',
+  fun: 'Fun & Party',
+  garbage: 'Garbage & Damage',
+  sign_out: 'Sign out',
+  sign_in_facebook: 'Sign in with Facebook',
+  sign_in_google: 'Sign in with Google',
+  skip: 'skip',
+  end_date: 'End date',
+  bounty: 'Bounty',
+  name: 'Name',
+  description: 'Description',
+  cancel: 'Cancel',
+  raise_bounty: 'Raise Bounty'
 }

@@ -2,6 +2,7 @@
 import { AccessToken, GraphRequest, GraphRequestManager, LoginManager } from 'react-native-fbsdk'
 import { AsyncStorage, DeviceEventEmitter, Platform } from 'react-native' //eslint-disable-line
 import { GoogleSignin } from 'react-native-google-signin'
+import * as firebase from 'firebase'
 
 import { googleSignIn } from './config'
 import type { Profile, AuthData } from './typedef'
@@ -51,7 +52,7 @@ class Auth {
 
   // Get profile photo url from auth data
   getProfilePhotoUrl (authData: AuthData): string {
-    if (authData.user) {
+    if (authData && authData.user) {
       return authData.type === 'facebook' ? authData.user.picture.data.url : authData.user.photo
     } else {
       return ''
@@ -66,12 +67,33 @@ class Auth {
         return {
           photo: this.getProfilePhotoUrl(authData),
           name: authData.user.name,
-          email: authData.user.email
+          email: authData.user.email,
+          id: authData.user.id
         }
       } else {
         return null
       }
     })
+  }
+
+  // Save user info to firebase if not already stored
+  saveUser (authData: AuthData): Promise<any> {
+    if (!authData || !authData.user) {
+      console.log('no data')
+      return Promise.resolve(false)
+    }
+    if (authData.type === LOGIN_TYPES.facebook || authData.type === LOGIN_TYPES.google) {
+      const ref = firebase.database().ref(`users/${authData.user.id}`)
+      return ref.once('value', (snapshot) => {
+        if (snapshot.exists()) {
+          console.log('user exists', authData.user.id)
+          return ref.set({ lastLogin: Date.now() })
+        }
+        console.log('saving user', authData.user.id)
+        return ref.set({ type: authData.type, user: authData.user, lastLogin: Date.now() })
+      })
+    }
+    return Promise.resolve(false)
   }
 
   // Save auth data
@@ -113,7 +135,7 @@ class Auth {
   }
 
   // Sign in with facebook
-  signInFacebook () {
+  signInFacebook (): Promise<any> {
     // FBLoginManager.setLoginBehavior(FBLoginManager.LoginBehaviors.Native) // defaults to Native
     const authData = {
       isAuthenticated: true,
@@ -122,7 +144,7 @@ class Auth {
       loginResult: {},
       token: {}
     }
-    LoginManager.logInWithReadPermissions(FB_LOGIN_PERMS)
+    return LoginManager.logInWithReadPermissions(FB_LOGIN_PERMS)
     .then((result: Object) => {
       if (result.isCancelled) {
         console.log('facebook sign in cancelled', result)
@@ -140,14 +162,19 @@ class Auth {
     .then((user: Object) => {
       authData.user = user
       this.setAuthData(authData)
+      return authData
+    })
+    .then((authData) => {
+      return this.saveUser(authData)
     })
     .catch((err) => {
       console.log('facebook sign in err', err)
+      return null
     })
   }
 
-  signInGoogle () {
-    GoogleSignin.configure({
+  signInGoogle (): Promise<any> {
+    return GoogleSignin.configure({
       iosClientId: Platform.OS === 'ios' ? googleSignIn.iosClientId : googleSignIn.webClientId // only for iOS
     })
     .then(() => {
@@ -157,9 +184,14 @@ class Auth {
       console.log('google sign in', user)
       const authData = { isAuthenticated: true, type: LOGIN_TYPES.google, user }
       this.setAuthData(authData)
+      return authData
+    })
+    .then((authData) => {
+      return this.saveUser(authData)
     })
     .catch((err) => {
       console.log('google sign in err', err)
+      return null
     })
   }
 

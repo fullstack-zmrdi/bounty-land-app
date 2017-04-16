@@ -4,14 +4,13 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 const navIconSize = (__DEV__ === false && Platform.OS === 'android') ? PixelRatio.getPixelSizeForLayoutSize(40) : 40; // eslint-disable-line
 const replaceSuffixPattern = /--(active|big|small|very-big)/g
 const icons = {
-  'ios-film-outline': [30],
-  'ios-film': [30],
-  'ios-desktop-outline': [30],
-  'ios-desktop': [30],
   'ios-search': [30],
   'ios-arrow-round-down': [navIconSize],
   'ios-arrow-back': [30],
-  'ios-close': [40]
+  'ios-heart': [30],
+  'ios-heart-outline': [30],
+  'ios-close': [40],
+  'ios-share-outline': [30]
 }
 
 const iconsMap = {}

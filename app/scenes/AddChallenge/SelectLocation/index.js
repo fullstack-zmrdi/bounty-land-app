@@ -9,8 +9,9 @@ import MapView from 'react-native-maps'
 import Toast from '@remobile/react-native-toast'
 import Icon from 'react-native-vector-icons/Ionicons'
 import RNFS from 'react-native-fs'
-
+import ObjectId from 'bson-objectid'
 import doneIcon from '../../../images/ic_save_white_24dp.png'
+import Auth from '../../../auth'
 
 type Region = {
   latitude: number,
@@ -93,15 +94,21 @@ class SelectLocationScreen extends Component<void, PropsType, StateType> {
 
   // Submit challenge to firebase
   saveChallenge (photoUrl: string): Promise<any> {
-    return firebase.database()
-    .ref('challenges/' + Date.now())
-    .set({
-      ...this.props.challengeData,
-      photo: photoUrl,
-      location: {
-        ...this.state.selectedLocation,
-        radiusInMeters: this.state.selectedLocationRadius
-      }
+    return Auth.getProfile()
+    .then((profile) => {
+      const oid = ObjectId().toString()
+      return firebase.database()
+      .ref(`challenges/${oid}`)
+      .set({
+        ...this.props.challengeData,
+        createdBy: profile.id,
+        id: oid,
+        photo: photoUrl,
+        location: {
+          ...this.state.selectedLocation,
+          radiusInMeters: this.state.selectedLocationRadius
+        }
+      })
     })
   }
 
@@ -120,16 +127,16 @@ class SelectLocationScreen extends Component<void, PropsType, StateType> {
       const photoName = urlParts[urlParts.length - 1]
       const imageRef = firebase.storage().ref().child(`photos/${Date.now()}-${photoName}`)
 
-      console.log('uri ', uri, 'photo naem', photoName)
+      // console.log('uri ', uri, 'photo naem', photoName)
 
       return RNFS.readFile(uri, 'base64')
       .then((data) => {
-        console.log('have data rnfs', typeof data, data.length)
+        // console.log('have data rnfs', typeof data, data.length)
         const payload = data.replace(/(\r\n|\n|\r)/gm, '').trim()
         return imageRef.putString(payload, 'base64')
       })
       .then((snapshot) => {
-        console.log('upload done', imageRef.getDownloadURL())
+        // console.log('upload done', imageRef.getDownloadURL())
         return imageRef.getDownloadURL()
       })
       .catch((err) => {

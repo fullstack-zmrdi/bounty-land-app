@@ -2,7 +2,8 @@
 export type Profile = {
   photo: string,
   name: string,
-  email: string
+  email: string,
+  id: string
 }
 
 export type AuthData = {
