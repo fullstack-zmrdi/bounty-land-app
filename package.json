@@ -60,5 +60,9 @@
       "app/locales",
       "flow-typed"
     ]
+  },
+  "engines": {
+    "node": "7.8.0",
+    "npm": "4.2.0"
   }
 }
