@@ -4,7 +4,6 @@ import map from 'lodash/map'
 import colors from 'material-colors'
 import React, { Component } from 'react'
 import { InteractionManager, Platform, StyleSheet, View, StatusBar } from 'react-native'
-import I18n from 'react-native-i18n'
 import MapView from 'react-native-maps'
 
 import plusIcon from '../../images/ic_add_white_24dp.png'
@@ -85,7 +84,7 @@ class Home extends Component<void, PropsType, StateType> {
   }
 
   componentDidMount () {
-        StatusBar.setBarStyle('dark-content', true)
+    StatusBar.setBarStyle('dark-content', true)
 
     InteractionManager.runAfterInteractions(() => {
       firebase.database().ref('/challenges').on('value', (snapshot) => {
@@ -124,7 +123,7 @@ class Home extends Component<void, PropsType, StateType> {
 
   // Update region on user geolocation change
   updateRegion (newRegion: Object): void {
-    this.setState({ ...this.state.region, newRegion })
+    this.setState({ region: { ...this.state.region, ...newRegion } })
   }
 
   // Open challenge detail

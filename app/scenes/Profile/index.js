@@ -101,6 +101,4 @@ class ProfileScreen extends Component<void, void, ProfileState> {
   }
 }
 
-
-
 export default ProfileScreen

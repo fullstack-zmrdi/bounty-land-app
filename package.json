@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "start": "node_modules/react-native/packager/packager.sh",
-    "lint": "standard",
-    "test": "jest",
+    "lint": "node_modules/.bin/standard",
+    "flow": "node_modules/.bin/flow",
+    "test": "node_modules/.bin/jest",
     "clean": "rm -fr $TMPDIR/react-* && watchman watch-del-all"
   },
   "dependencies": {
@@ -50,7 +51,8 @@
     ],
     "globals": [
       "fetch",
-      "__DEV__"
+      "__DEV__",
+      "it"
     ],
     "ignore": [
       ".vscode",

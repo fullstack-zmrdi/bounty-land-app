@@ -12,6 +12,8 @@ import { firebaseConfig } from './config'
 import { registerScreens } from './scenes'
 import { iconsLoaded } from './images/Icons'
 
+import type { AuthData } from './typedef'
+
 const DEFAULT_LOCALE = I18n.locale.split('-')[0]
 const handleMissing = (scope) => `${scope || 'unknown'}`
 
@@ -23,9 +25,8 @@ registerScreens()
 
 class App {
   authData: Object;
-  firebaseInitialized: boolean;
   constructor () {
-    console.log('app constructor')
+    // console.log('app constructor')
     this.authData = {}
 
     Promise.all([
@@ -33,14 +34,14 @@ class App {
       iconsLoaded
     ])
     .then((results) => {
-      [ authData, loaded ] = results
-      console.log('initial auth data', authData)
+      const [ authData ] = results
+      // console.log('initial auth data', authData)
       this.authData = authData
       this.startApp(authData)
     })
 
     Auth.listenAuthChange((authData) => {
-      console.log('auth change', authData)
+      // console.log('auth change', authData)
       if (!this.authData || (this.authData.isAuthenticated !== authData.isAuthenticated)) {
         this.startApp(authData)
       }
@@ -53,12 +54,12 @@ class App {
   /**
    * Start app
    */
-  startApp (authData) {
+  startApp (authData: AuthData) {
     if (!authData || !authData.isAuthenticated) {
-      console.log('start app dont have user')
+      // console.log('start app dont have user')
       this.startAppAsUnauthenticatedUser()
     } else {
-      console.log('start app have user', authData)
+      // console.log('start app have user', authData)
       this.startAppAsAuthenticatedUser(authData)
     }
   }
@@ -66,12 +67,12 @@ class App {
   /**
    * Start app as authenticated user
    */
-  startAppAsAuthenticatedUser (authData) {
+  startAppAsAuthenticatedUser (authData: AuthData): void {
     if (Platform.OS === 'ios') {
-      console.log('start ios')
+      // console.log('start ios')
       this.startAppAsAuthenticatedUserIos(authData)
     } else {
-      console.log('start android')
+      // console.log('start android')
       this.startAppAsAuthenticatedUserAndroid(authData)
     }
   }
@@ -171,12 +172,10 @@ class App {
    * Init firebase
    */
   initFirebase () {
-    console.log('init firebase')
-    if (this.firebaseInitialized) {
-      return
+    // console.log('init firebase')
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig)
     }
-    this.firebaseInitialized = true
-    firebase.initializeApp(firebaseConfig)
   }
 }
 

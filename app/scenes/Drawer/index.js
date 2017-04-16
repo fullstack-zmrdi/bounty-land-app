@@ -1,9 +1,8 @@
-import React, {Component} from 'react'
-import { View, NativeModules } from 'react-native'
+import React, { Component } from 'react'
+import { NativeModules } from 'react-native'
 import I18n from 'react-native-i18n'
-import { Container, Content, Button, Text, List, ListItem, Left, Body, Icon } from 'native-base'
+import { Container, Content, Text, ListItem } from 'native-base'
 import colors from 'material-colors'
-
 
 class Drawer extends Component {
   pushScreen (screen) {

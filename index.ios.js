@@ -1,2 +1,2 @@
 import App from './app/index.js'
-new App()
+new App() // eslint-disable-line

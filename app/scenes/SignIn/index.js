@@ -9,7 +9,6 @@ import Auth, { LOGIN_TYPES } from '../../auth'
 import backgroundImage from '../../images/bounty_bg.png'
 import logoImage from '../../images/logo.png'
 
-
 class SignIn extends Component<void, void, void> {
   static navigatorStyle = {
     navBarHidden: true // make the nav bar hidden

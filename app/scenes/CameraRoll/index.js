@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, TouchableOpacity, Platform, CameraRoll, Text } from 'react-native'
+import { View, CameraRoll, Text } from 'react-native'
 
 class CameraRollScreen extends Component {
   state = {
