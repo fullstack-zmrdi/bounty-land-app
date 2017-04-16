@@ -1,5 +1,5 @@
 # Bounty Land Mobile App
-[Travis CI badge](https://travis-ci.org/fullstack-zmrdi/bounty-land-app.svg?branch=master)
+![Travis CI badge](https://travis-ci.org/fullstack-zmrdi/bounty-land-app.svg?branch=master)
 [![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
 Bounty land app for iOS and Android built with React Native
