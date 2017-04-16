@@ -1,13 +1,16 @@
 /* @flow */
 import * as firebase from 'firebase'
 import colors from 'material-colors'
-import { Text } from 'native-base'
+import { Text, Spinner } from 'native-base'
 import React, { Component } from 'react'
 import { Platform, Slider, StyleSheet, View, TouchableOpacity } from 'react-native'
 import I18n from 'react-native-i18n'
 import MapView from 'react-native-maps'
 import Toast from '@remobile/react-native-toast'
 import Icon from 'react-native-vector-icons/Ionicons'
+import RNFS from 'react-native-fs'
+
+import doneIcon from '../../../images/ic_save_white_24dp.png'
 
 type Region = {
   latitude: number,
@@ -19,7 +22,8 @@ type Region = {
 type StateType = {
   region: Region,
   selectedLocationRadius: number,
-  selectedLocation: Object
+  selectedLocation: Object,
+  progress: boolean
 }
 
 type PropsType = {
@@ -44,8 +48,17 @@ class SelectLocationScreen extends Component<void, PropsType, StateType> {
     })
   }
 
+  static navigatorButtons = {
+    fab: {
+      collapsedId: 'save_challenge',
+      collapsedIcon: doneIcon,
+      backgroundColor: colors.red['500']
+    }
+  }
+
   state = {
     position: {},
+    progress: false,
     selectedLocation: {
       latitude: 37.78825,
       longitude: -122.4324
@@ -71,6 +84,7 @@ class SelectLocationScreen extends Component<void, PropsType, StateType> {
   // Display error message
   showMessage (message: string): void {
     if (Platform.OS === 'ios') {
+      console.log(message)
       Toast.showLongBottom(message)
     } else {
       this.props.navigator.showSnackbar({ text: message })
@@ -78,11 +92,12 @@ class SelectLocationScreen extends Component<void, PropsType, StateType> {
   }
 
   // Submit challenge to firebase
-  saveChallenge (): Promise<any> {
+  saveChallenge (photoUrl: string): Promise<any> {
     return firebase.database()
     .ref('challenges/' + Date.now())
     .set({
       ...this.props.challengeData,
+      photo: photoUrl,
       location: {
         ...this.state.selectedLocation,
         radiusInMeters: this.state.selectedLocationRadius
@@ -95,6 +110,36 @@ class SelectLocationScreen extends Component<void, PropsType, StateType> {
     this.setState({ selectedLocationRadius: radius })
   }
 
+  // Upload challenge photo if provided
+  uploadPhoto (): Promise<string> {
+    if (!this.props.challengeData.photo) {
+      return Promise.resolve('')
+    } else {
+      const uri = this.props.challengeData.photo.replace('file://', '') // RNFetchBlob.wrap()
+      const urlParts = this.props.challengeData.photo.split('/')
+      const photoName = urlParts[urlParts.length - 1]
+      const imageRef = firebase.storage().ref().child(`photos/${Date.now()}-${photoName}`)
+
+      console.log('uri ', uri, 'photo naem', photoName)
+
+      return RNFS.readFile(uri, 'base64')
+      .then((data) => {
+        console.log('have data rnfs', typeof data, data.length)
+        const payload = data.replace(/(\r\n|\n|\r)/gm, '').trim()
+        return imageRef.putString(payload, 'base64')
+      })
+      .then((snapshot) => {
+        console.log('upload done', imageRef.getDownloadURL())
+        return imageRef.getDownloadURL()
+      })
+      .catch((err) => {
+        console.log(err)
+        this.showMessage(I18n.t('photo_upload_failed'))
+        return ''
+      })
+    }
+  }
+
   // Save challenge and show challenge added modal
   onConfirmPress (): void {
     const screen = {
@@ -103,8 +148,13 @@ class SelectLocationScreen extends Component<void, PropsType, StateType> {
         backgroundBlur: 'dark'
       }
     }
-    this.saveChallenge()
+    this.setState({ progress: true })
+    this.uploadPhoto()
+    .then((photoUrl: string) => {
+      return this.saveChallenge(photoUrl)
+    })
     .then(() => {
+      this.setState({ progress: false })
       if (Platform.OS === 'ios') {
         this.props.navigator.dismissLightBox()
         this.props.navigator.showLightBox(screen)
@@ -113,6 +163,7 @@ class SelectLocationScreen extends Component<void, PropsType, StateType> {
       }
     })
     .catch((err) => {
+      this.setState({ progress: false })
       this.showMessage(err.message)
     })
   }
@@ -166,6 +217,15 @@ class SelectLocationScreen extends Component<void, PropsType, StateType> {
     )
   }
 
+  // Render progress spinner
+  renderProgress (): View {
+    return (
+      <View style={styles.progressContainer}>
+        <Spinner color={colors.cyan['500']} />
+      </View>
+    )
+  }
+
   render (): View {
     return (
       <View style={styles.container}>
@@ -181,8 +241,13 @@ class SelectLocationScreen extends Component<void, PropsType, StateType> {
           <MapView.Marker
             coordinate={this.state.selectedLocation} />
         </MapView>
-        {this.renderUndoButton()}
-        {this.renderBottomNavigation()}
+        {this.state.progress
+        ? this.renderProgress()
+        : ([
+          this.renderUndoButton(),
+          this.renderBottomNavigation()
+        ])}
+
       </View>
     )
   }
@@ -193,6 +258,12 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'flex-end',
     alignItems: 'center'
+  },
+  progressContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255,255,255,0.6)',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   map: {
     ...StyleSheet.absoluteFillObject

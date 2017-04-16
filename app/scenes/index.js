@@ -6,10 +6,12 @@ import Home from './Home'
 import { Navigation } from 'react-native-navigation'
 import Profile from './Profile'
 import SignIn from './SignIn'
-import TakePicture from './AddChallenge/TakePicture'
-import SelectLocation from './AddChallenge/SelectLocation'
-import ChallengeAdded from './AddChallenge/ChallengeAdded'
-import AddChallengeDetails from './AddChallenge/AddDetails'
+import {
+  TakePicture,
+  SelectLocation,
+  ChallengeAdded,
+  AddChallengeDetails
+} from './AddChallenge'
 import Wallet from './Wallet'
 import CameraRoll from './CameraRoll'
 

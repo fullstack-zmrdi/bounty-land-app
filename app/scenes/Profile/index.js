@@ -9,10 +9,6 @@ import Auth from '../../auth'
 import { navigatorStyle } from '../../theme'
 import type { Profile } from '../../typedef'
 
-type ProfileProps = {
-
-}
-
 type ProfileState = {
   profile: ?Profile,
   profileLoaded: boolean
@@ -44,7 +40,7 @@ const styles = StyleSheet.create({
   }
 })
 
-class ProfileScreen extends Component<void, ProfileProps, ProfileState> {
+class ProfileScreen extends Component<void, void, ProfileState> {
   static navigatorStyle = navigatorStyle
 
   state = {

@@ -12,3 +12,19 @@ export type AuthData = {
   loginResult?: Object,
   token?: Object
 }
+
+export type Challenge = {
+  createdBy: string,
+  name: string,
+  location: {
+    radiusInMeters: number,
+    latitude: number,
+    longitude: number
+  },
+  photo: string,
+  description: string,
+  bounty: number,
+  endDate: string,
+  supporters: Array<string>,
+  participants: Array<string>
+}

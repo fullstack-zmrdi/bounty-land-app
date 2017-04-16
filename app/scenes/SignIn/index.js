@@ -1,72 +1,112 @@
-import * as firebase from "firebase"
+import { Container, Text } from 'native-base'
+import { Image, View, StyleSheet } from 'react-native'
+import React, { Component } from 'react'
+import Icon from 'react-native-vector-icons/Zocial'
+import colors from 'material-colors'
+import I18n from 'react-native-i18n'
 
-import { Body, Button, Card, CardItem, Container, Content, Form, H2, Input, Item, Label, Row, Text } from 'native-base';
-import { Image, Platform, View } from 'react-native'
-import React, {Component} from 'react'
+import Auth, { LOGIN_TYPES } from '../../auth'
+import backgroundImage from '../../images/bounty_bg.png'
+import logoImage from '../../images/logo.png'
 
-import Auth from '../../auth'
-import Icon from 'react-native-vector-icons/Zocial';
-import MapView from 'react-native-maps';
-import Toast from '@remobile/react-native-toast'
 
-class SignIn extends Component {
+class SignIn extends Component<void, void, void> {
   static navigatorStyle = {
-     navBarHidden: true, // make the nav bar hidden
+    navBarHidden: true // make the nav bar hidden
   }
 
-  constructor () {
-    super()
-    this.auth = Auth
+  // Sign in with facebook
+  signInFacebook (): void {
+    Auth.signInFacebook()
   }
 
-  signInFacebook () {
-    this.auth.signInFacebook()
+  // Sign in with google
+  signInGoogle (): void {
+    Auth.signInGoogle()
   }
 
-  signInGoogle () {
-    this.auth.signInGoogle()
+  // Render logo
+  renderLogo (): View {
+    return (
+      <View style={styles.logoContainer}>
+        <Image
+          style={styles.logoImage}
+          source={logoImage} />
+      </View>
+    )
   }
 
-  render () {
-      return (
-        <Container>
-          <Image
-            source={require('../../images/bounty_bg.png')}
-            style={{ flex: 1, resizeMode: 'cover', alignItems: 'center', justifyContent: 'center', width: null, height: null }}>
-                <View>
-                <View style={{ width: 200, height: 200, alignSelf: 'center', marginBottom: 25 }}>
-                  <Image
-                    style={{ resizeMode: 'contain', width: null, height: null, flex: 1 }}
-                    source={require('../../images/logo.png')}/>
-                </View>
-                <View style={{ marginBottom: 10 }}>
-                  <Icon.Button
-                      style={{ width: 270, justifyContent: 'center' }}
-                      name="facebook"
-                      color={'#fff'}
-                      backgroundColor="#3b5998"
-                      onPress={() => this.signInFacebook()}>
-                      <Text style={{ color: '#fff' }}>Sign in with Facebook</Text>
-                    </Icon.Button>
-                </View>
-                <View>
-                  <Icon.Button
-                    name="google"
-                    style={{ width: 270, justifyContent: 'center' }}
-                    color={'#fff'}
-                    backgroundColor='#ff0000'
-                    onPress={() => this.signInGoogle()}>
-                    <Text  style={{ color: '#fff' }}>Sign in with Google</Text>
-                  </Icon.Button>
-                </View>
+  // Render sign in buttons
+  renderButtons (): View {
+    return ([
+      <View key={0}style={{ marginBottom: 10 }}>
+        <Icon.Button
+          style={styles.signInButton}
+          name={LOGIN_TYPES.facebook}
+          color={colors.white}
+          backgroundColor='#3b5998'
+          onPress={() => this.signInFacebook()}>
+          <Text style={{ color: colors.white }}>
+            {I18n.t('sign_in_facebook')}
+          </Text>
+        </Icon.Button>
+      </View>,
+      <View key={1}>
+        <Icon.Button
+          name={LOGIN_TYPES.google}
+          style={styles.signInButton}
+          color={colors.white}
+          backgroundColor='#ff0000'
+          onPress={() => this.signInGoogle()}>
+          <Text style={{ color: colors.white }}>
+            {I18n.t('sign_in_google')}
+          </Text>
+        </Icon.Button>
+      </View>
+    ])
+  }
 
-
-                </View>
-          </Image>
-        </Container>
-
-      )
+  render (): Container {
+    return (
+      <Container>
+        <Image
+          source={backgroundImage}
+          style={styles.backgroundImage}>
+          <View>
+            {this.renderLogo()}
+            {this.renderButtons()}
+          </View>
+        </Image>
+      </Container>
+    )
   }
 }
+
+const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: null,
+    height: null
+  },
+  logoContainer: {
+    width: 200,
+    height: 200,
+    alignSelf: 'center',
+    marginBottom: 25
+  },
+  logoImage: {
+    resizeMode: 'contain',
+    width: null,
+    height: null,
+    flex: 1
+  },
+  signInButton: {
+    width: 270,
+    justifyContent: 'center'
+  }
+})
 
 export default SignIn

@@ -1,17 +1,25 @@
+/* @flow */
 import * as firebase from 'firebase'
 import map from 'lodash/map'
 import colors from 'material-colors'
-import { Text } from 'native-base'
 import React, { Component } from 'react'
-import { InteractionManager, Platform, Slider, StyleSheet, View } from 'react-native'
+import { InteractionManager, Platform, StyleSheet, View } from 'react-native'
 import I18n from 'react-native-i18n'
 import MapView from 'react-native-maps'
 
-import doneIcon from '../../images/ic_save_white_24dp.png'
 import plusIcon from '../../images/ic_add_white_24dp.png'
 import searchIcon from '../../images/ic_search_black_24dp.png'
+import type { Challenge } from '../../typedef'
 
-class Home extends Component {
+type PropsType = {
+  navigator: Object
+}
+
+type StateType = {
+  challenges: Array<Challenge>
+}
+
+class Home extends Component<void, PropsType, StateType> {
   static navigatorStyle = {
     ...Platform.select({
       ios: {
@@ -76,22 +84,10 @@ class Home extends Component {
     }
   }
 
-  componentWillUpdate (nextState) {
-    if (nextState.selectLocation) {
-      console.log('test update')
-      this.props.navigator.toggleTabs({
-        to: 'hidden',
-        animated: true
-      })
-    }
-  }
-
-
   componentDidMount () {
     InteractionManager.runAfterInteractions(() => {
       firebase.database().ref('/challenges').on('value', (snapshot) => {
         this.setState({ challenges: snapshot.val() })
-        console.log(snapshot.val())
       })
       this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this))
       /*
@@ -103,91 +99,38 @@ class Home extends Component {
     })
   }
 
-  /**
-   * Handle navigator event
-   */
+  // Handle navigator event
   onNavigatorEvent (event: Object): void {
     // console.log(event)
     if (event.type === 'NavBarButtonPress') {
       if (event.id === 'add_challenge') {
         this.onAddChallengePress()
       }
-
-      if (event.id === 'save_challenge') {
-        this.saveChallenge()
-      }
     }
   }
 
-  onAddChallengePress () {
+  // Open camera to take picture for new challenge
+  onAddChallengePress (): void {
     this.props.navigator.showModal({
       screen: 'TAKE_PICTURE',
       navigatorStyle: {
         navBarHidden: true
       },
-      passProps: {
-        onSelectLocationPress: this.selectLocationForChallenge.bind(this)
-      }
+      passProps: {}
     })
   }
 
-  selectLocationForChallenge (challengeData) {
-    console.log(challengeData)
-    this.props.navigator.setTitle({ title: I18n.t('select_location') })
-
-    this.props.navigator.toggleNavBar({
-      to: 'hidden',
-      animated: true
-    })
-    this.props.navigator.setButtons({
-      fab: {
-        collapsedId: 'save_challenge',
-        collapsedIcon: doneIcon,
-        backgroundColor: colors.red['500']
-      }
-    })
-    this.setState({ challengeData, selectLocation: true })
-  }
-
-  onMapPress ({ coordinate }) {
-    console.log('map press', coordinate)
-    if (this.state.selectLocation) {
-      this.setState({
-        selectedLocation: coordinate,
-        region: { ...this.state.region, ...coordinate }
-      })
-    }
-  }
-
-  saveChallenge () {
-    firebase.database()
-      .ref('challenges/' + Date.now())
-      .set({
-        ...this.state.challengeData,
-        location: {
-          ...this.state.selectedLocation,
-          radiusInMeters: this.state.selectedLocationRadius
-        }
-      })
-      .then(() => this.props.navigator.showSnackbar({ text: I18n.t('challenge_published') }))
-      .catch((err) => this.props.navigator.showSnackbar({ text: err.message}))
-
-    this.props.navigator.setTitle('')
-    this.props.navigator.setButtons({
-      ...navigatorButtons
-    })
-
-    this.setState({ selectLocation: false, challengeData: {} })
-  }
-
-  updateRegion (newRegion) {
+  // Update region on user geolocation change
+  updateRegion (newRegion: Object): void {
     this.setState({ ...this.state.region, newRegion })
   }
 
-  openChallengeDetail (challenge) {
+  // Open challenge detail
+  onChallengePress (challenge: Challenge): void {
     this.props.navigator.showModal({
       screen: 'CHALLENGE_DETAIL',
-      passProps: { challenge }
+      passProps: { challenge },
+      title: challenge.name
     })
   }
 
@@ -195,45 +138,18 @@ class Home extends Component {
     return (
       <View style={styles.container}>
         <MapView
-          onPress={(data) => this.onMapPress(data.nativeEvent)}
           style={styles.map}
           region={this.state.region}>
-          {this.state.selectLocation
-            ? (
-              [
-                <MapView.Circle
-                  key={0}
-                  center={this.state.selectedLocation}
-                  radius={this.state.selectedLocationRadius}
-                  fillColor={'#333'}
-                  strokeWidth={0} />,
-                <MapView.Marker
-                  key={1}
-                  coordinate={this.state.selectedLocation} />
-              ]
-
-            ) : (
-              map(this.state.challenges, (challenge) => (
-                <MapView.Marker
-                  onPress={() => this.openChallengeDetail(challenge)}
-                  coordinate={{ latitude: challenge.location.latitude, longitude: challenge.location.longitude}}
-                  title={challenge.name}
-                  description={challenge.description} />
-              ))
-            )}
+          {
+            map(this.state.challenges, (challenge) => (
+              <MapView.Marker
+                onPress={this.onChallengePress.bind(this, challenge)}
+                coordinate={{ latitude: challenge.location.latitude, longitude: challenge.location.longitude }}
+                title={challenge.name}
+                description={challenge.description} />
+            ))
+          }
         </MapView>
-        {this.state.selectLocation
-          ? (
-            <View style={{ alignSelf: 'flex-start', borderRadius: 2, elevation: 4, paddingVertical: 8, backgroundColor: colors.white, margin: 16 }}>
-              <Text style={{ paddingHorizontal: 16 }}>{I18n.t('area_radius')} {this.state.selectedLocationRadius}m</Text>
-              <Slider
-                style={{ width: 200 }}
-                step={5}
-                maximumValue={1000}
-                minimumValue={10}
-                onSlidingComplete={(value) => this.setState({ selectedLocationRadius: value })} />
-            </View>
-          ) : null}
       </View>
     )
   }
@@ -247,7 +163,7 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject
-  },
+  }
 })
 
 export default Home

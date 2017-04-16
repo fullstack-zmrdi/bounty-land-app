@@ -10,6 +10,7 @@ import czechTranslations from './locales/cs'
 import englishTranslations from './locales/en'
 import { firebaseConfig } from './config'
 import { registerScreens } from './scenes'
+import { iconsLoaded } from './images/Icons'
 
 const DEFAULT_LOCALE = I18n.locale.split('-')[0]
 const handleMissing = (scope) => `${scope || 'unknown'}`
@@ -27,8 +28,12 @@ class App {
     console.log('app constructor')
     this.authData = {}
 
-    Auth.getAuthData()
-    .then((authData: Object) => {
+    Promise.all([
+      Auth.getAuthData(),
+      iconsLoaded
+    ])
+    .then((results) => {
+      [ authData, loaded ] = results
       console.log('initial auth data', authData)
       this.authData = authData
       this.startApp(authData)
@@ -41,7 +46,6 @@ class App {
       }
       this.authData = authData
     })
-
     this.configureI18n()
     this.initFirebase()
   }
