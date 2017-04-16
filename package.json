@@ -7,7 +7,10 @@
     "lint": "node_modules/.bin/standard",
     "flow": "node_modules/.bin/flow",
     "test": "node_modules/.bin/jest",
-    "clean": "rm -fr $TMPDIR/react-* && watchman watch-del-all"
+    "clean": "rm -fr $TMPDIR/react-* && watchman watch-del-all",
+    "bundle:android": "./scripts/bundle.sh android",
+    "bundle:ios": "./scripts/bundle.sh ios",
+    "bundle:all": "npm run bundle:android && npm run bundle:ios"
   },
   "dependencies": {
     "@remobile/react-native-toast": "^1.0.6",
@@ -15,7 +18,7 @@
     "firebase": "^3.7.5",
     "lodash": "^4.17.4",
     "material-colors": "^1.2.5",
-    "native-base": "^2.1.0",
+    "native-base": "2.1.0",
     "react": "^15.4.2",
     "react-native": "^0.42.3",
     "react-native-camera": "^0.6.0",
@@ -27,7 +30,7 @@
     "react-native-i18n": "^1.0.0",
     "react-native-linear-gradient": "^2.0.0",
     "react-native-maps": "^0.13.1",
-    "react-native-navigation": "^2.0.0-experimental.256",
+    "react-native-navigation": "2.0.0-experimental.256",
     "react-native-vector-icons": "^4.0.0"
   },
   "devDependencies": {
@@ -55,9 +58,15 @@
     ],
     "ignore": [
       ".vscode",
+      ".bundles",
       "android",
       "ios",
-      "app/locales"
+      "app/locales",
+      "flow-typed"
     ]
+  },
+  "engines": {
+    "node": "7.8.0",
+    "npm": "4.2.0"
   }
 }

@@ -4,13 +4,18 @@ node_js:
 
 install:
   - npm install
+  - npm install -g react-native-cli
 
 script:
   - npm run lint
   - npm run flow
   - npm test
-
+  - npm run bundle:all
 
 branches:
   only:
     - master
+
+notifications:
+  email:
+    - martycakjakub@gmail.com
