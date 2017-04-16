@@ -57,7 +57,8 @@
       ".vscode",
       "android",
       "ios",
-      "app/locales"
+      "app/locales",
+      "flow-typed"
     ]
   }
 }
