@@ -51,6 +51,8 @@
 		3F6219B201A44E0D94D2C655 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6ECD22360C524DC286E57864 /* EvilIcons.ttf */; };
 		3FA28C65C0EF40058A1FBBA5 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 949817DCAA1C43CEB175EE62 /* MaterialIcons.ttf */; };
 		40119BF03E4E490A9A2165AB /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 118836F38C3749FBB7C0D029 /* FontAwesome.ttf */; };
+		4084C3C41EA2D6CE00C87E59 /* bounty_bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 4084C3C31EA2D6CE00C87E59 /* bounty_bg.png */; };
+		4084C3E71EA2D6DC00C87E59 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 4084C3E61EA2D6DC00C87E59 /* logo.png */; };
 		4086BA021EA250FE0048BF0B /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4086B9FF1EA250FE0048BF0B /* FBSDKCoreKit.framework */; };
 		4086BA031EA250FE0048BF0B /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4086BA001EA250FE0048BF0B /* FBSDKLoginKit.framework */; };
 		4086BA041EA250FE0048BF0B /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4086BA011EA250FE0048BF0B /* FBSDKShareKit.framework */; };
@@ -394,6 +396,8 @@
 		332DE3D951BB49BBA35D3FAE /* Roboto_medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Roboto_medium.ttf; path = "../node_modules/native-base/Fonts/Roboto_medium.ttf"; sourceTree = "<group>"; };
 		3BB17A1900CE474A8844EBAE /* Times New Roman.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Times New Roman.ttf"; path = "../node_modules/native-base/Fonts/Times New Roman.ttf"; sourceTree = "<group>"; };
 		3F40AA347FA543BDA08273A3 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/native-base/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
+		4084C3C31EA2D6CE00C87E59 /* bounty_bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bounty_bg.png; sourceTree = "<group>"; };
+		4084C3E61EA2D6DC00C87E59 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
 		4086B9FF1EA250FE0048BF0B /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKCoreKit.framework; path = Frameworks/FBSDKCoreKit.framework; sourceTree = "<group>"; };
 		4086BA001EA250FE0048BF0B /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKLoginKit.framework; path = Frameworks/FBSDKLoginKit.framework; sourceTree = "<group>"; };
 		4086BA011EA250FE0048BF0B /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKShareKit.framework; path = Frameworks/FBSDKShareKit.framework; sourceTree = "<group>"; };
@@ -670,8 +674,10 @@
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				690C73FA1E97F32E00EE6CD4 /* GoogleService-Info.plist */,
+				4084C3E61EA2D6DC00C87E59 /* logo.png */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
+				4084C3C31EA2D6CE00C87E59 /* bounty_bg.png */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
 			);
@@ -1312,6 +1318,8 @@
 				7E29F5A7F54E4AE09EB41A19 /* Foundation.ttf in Resources */,
 				F85DAF9D2027407BBF043C1D /* Georgia.ttf in Resources */,
 				97E76B772F344BEDA7AE1AB1 /* Ionicons.ttf in Resources */,
+				4084C3C41EA2D6CE00C87E59 /* bounty_bg.png in Resources */,
+				4084C3E71EA2D6DC00C87E59 /* logo.png in Resources */,
 				3FA28C65C0EF40058A1FBBA5 /* MaterialIcons.ttf in Resources */,
 				3C39847592C843389F8B5D24 /* Microsoft Sans Serif.ttf in Resources */,
 				35A9D8BE89A04DECBCB4FF01 /* Octicons.ttf in Resources */,
