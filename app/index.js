@@ -40,7 +40,7 @@ class App {
       this.startApp(authData)
     })
 
-    Auth.listenAuthChange((authData) => {
+    Auth.listenAuthChange((authData: AuthData) => {
       // console.log('auth change', authData)
       if (!this.authData || (this.authData.isAuthenticated !== authData.isAuthenticated)) {
         this.startApp(authData)

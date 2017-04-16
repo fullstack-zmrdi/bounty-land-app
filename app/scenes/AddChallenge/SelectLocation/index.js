@@ -97,6 +97,9 @@ class SelectLocationScreen extends Component<void, PropsType, StateType> {
     return Auth.getProfile()
     .then((profile) => {
       const oid = ObjectId().toString()
+      if (!profile) {
+        return Promise.resolve(true)
+      }
       return firebase.database()
       .ref(`challenges/${oid}`)
       .set({

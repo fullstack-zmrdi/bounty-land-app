@@ -15,7 +15,8 @@ type PropsType = {
 }
 
 type StateType = {
-  challenges: Array<Challenge>
+  challenges: Array<Challenge>,
+  region: Object
 }
 
 class Home extends Component<void, PropsType, StateType> {

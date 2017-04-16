@@ -7,7 +7,7 @@ import I18n from 'react-native-i18n'
 
 import Auth from '../../auth'
 import { navigatorStyle } from '../../theme'
-import type { Profile, AuthData } from '../../typedef'
+import type { Profile } from '../../typedef'
 
 type ProfileState = {
   profile: ?Profile,
@@ -50,16 +50,9 @@ class ProfileScreen extends Component<void, void, ProfileState> {
 
   componentDidMount (): void {
     Auth.getProfile()
-    .then((profile: ?Profile): void => {
+    .then((profile:?Profile): void => {
       this.setState({ profileLoaded: true, profile })
     })
-
-    if (__DEV__) {
-      Auth.getAuthData()
-      .then((authData: ?AuthData): void => {
-        this.setState({ authData })
-      })
-    }
   }
 
   signOut (): void {
@@ -69,29 +62,23 @@ class ProfileScreen extends Component<void, void, ProfileState> {
   render (): Container {
     return (
       <Container style={StyleSheet.flatten(styles.container)}>
-        {this.state.profileLoaded && this.state.profile
+        {this.state.profile && this.state.profileLoaded
         ? (
           <Content contentContainerStyle={{ alignItems: 'center' }}>
             <Image
               source={{ uri: this.state.profile.photo }}
               style={StyleSheet.flatten(styles.profilePhoto)} />
             <H2 style={StyleSheet.flatten(styles.name)}>
-              {this.state.profile.name}
+              {this.state.profile && this.state.profile.name}
             </H2>
             <H3 style={StyleSheet.flatten(styles.email)}>
-              {this.state.profile.email}
+              {this.state.profile && this.state.profile.email}
             </H3>
             <Button
               style={StyleSheet.flatten(styles.signOutButton)}
               onPress={() => this.signOut()}>
               <Text>{I18n.t('sign_out')}</Text>
             </Button>
-            {__DEV__ && this.state.authData
-            ? (
-              <Text>
-                {JSON.stringify(this.state.authData, null, 4)}
-              </Text>
-            ) : null}
           </Content>
         ) : (
           <Spinner />

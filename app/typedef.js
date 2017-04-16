@@ -1,4 +1,6 @@
 /* @flow */
+import type FBAccessToken from 'react-native-fbsdk/js/FBAccessToken.js'
+
 export type Profile = {
   photo: string,
   name: string,
@@ -6,12 +8,20 @@ export type Profile = {
   id: string
 }
 
+export type User = {
+  name: string,
+  email: string,
+  id: string,
+  picture?: Object,
+  photo?: string
+}
+
 export type AuthData = {
   isAuthenticated: boolean,
   type: 'facebook'|'google'|'unknown',
-  user: ?Object,
+  user?: User,
   loginResult?: Object,
-  token?: Object
+  token?: FBAccessToken
 }
 
 export type Challenge = {

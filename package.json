@@ -35,11 +35,10 @@
     "babel-jest": "19.0.0",
     "babel-preset-react-native": "1.9.1",
     "eslint-plugin-flowtype": "^2.30.4",
-    "flow-bin": "0.43.1",
+    "flow-bin": "^0.38.0",
     "jest": "19.0.2",
     "react-test-renderer": "^15.4.2",
-    "standard": "^10.0.1",
-    "watchman": "^0.1.8"
+    "standard": "^10.0.1"
   },
   "jest": {
     "preset": "react-native"
