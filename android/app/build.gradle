@@ -133,8 +133,9 @@ android {
 }
 
 dependencies {
-
-    compile project(':react-native-toast')
+    compile project(':react-native-fs')
+    compile project(':@remobile/react-native-toast')
+    compile project(':react-native-fetch-blob')
     compile project(':react-native-vector-icons')
     compile project(':react-native-navigation')
     compile project(':react-native-google-signin')

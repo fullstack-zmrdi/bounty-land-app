@@ -18,6 +18,8 @@ import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnativenavigation.NavigationApplication;
 import com.reactnativenavigation.controllers.ActivityCallbacks;
 import com.remobile.toast.RCTToastPackage;
+import com.rnfs.RNFSPackage;
+import com.RNFetchBlob.RNFetchBlobPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -63,7 +65,9 @@ public class MainApplication extends NavigationApplication {
             new RCTToastPackage(),
             new RNGoogleSigninPackage(),
             new FBSDKPackage(mCallbackManager),
-            new MapsPackage()
+            new MapsPackage(),
+            new RNFSPackage(),
+            new RNFetchBlobPackage()
         );
     }
 }
