@@ -1,6 +1,43 @@
-language: node_js
-node_js:
-  - "7.8.0"
+language: android
+sudo: required
+jdk:
+  - oraclejdk8
+
+android:
+  components:
+    - tools
+    - tools
+    - platform-tools
+    - build-tools-25.0.1
+    - android-25
+    - extra-android-m2repository
+    - extra-google-m2repository
+    - extra-android-support
+    - extra-google-google_play_services
+
+  licenses:
+    - 'android-sdk-preview-license-.*'
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
+    - '.+'
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $TRAVIS_BUILD_DIR/node_modules
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
+
+before_install:
+  - mkdir "$ANDROID_HOME/licenses" || true
+  - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
+  - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
+  - nvm install 7.8.0
+  - node --version
 
 install:
   - npm install
@@ -9,8 +46,9 @@ install:
 script:
   - npm run lint
   - npm run flow
-  - npm test
+  - npm run test
   - npm run bundle:all
+  - cd android && ./gradlew assembleRelease
 
 branches:
   only:
@@ -18,4 +56,12 @@ branches:
 
 notifications:
   email:
-    - martycakjakub@gmail.com
+   - martycakjakub@gmail.com
+
+deploy:
+  provider: releases
+  api_key:
+    secure: cbB9681WD6y1r5EqZqDjNzxuU/XLhTCcOh9NfvYf9dRGhzH4cvRmMiyD294hOf40Vz8Rvf3r64kiWKNN1N2SKblz9VfT4hot+hdkTpH/Gyc/2tPimTx1mD4MSPPb5wFBK2SYSKeTKQDsVFpElU6B0Z3AvjX322XiyeL2hKMuUQoS8Vqy+L1hdLfS9woi0fheq1SGECQU6z+N4Oqf8lrBG5lGDYdV92u+r7ICg/PU+OCQlQhx5924QoculMnVe6p0jaSx1Ud63uGIQ9sxH+eb6bAAQkdnv7oMYX0hgWTqov9rhODTyyYYnEZmzrQ48dn2l2u2MrEC9FD/YCU5mNc/jVcZnMrX+oljDfa5Cb5kWb6Mltx19mjn30utMhY6D33LjqfOl/uoThF3lI0CJ36zLwY11Gq7dVZPgL3JCFNVx7dob4OwqPMnK+gKTkj0swGjrqt35RqwEMKdxbwqI25wbaeFsrrL9OG8CqgHaSXxlAWaBQ/KukvmD694ccf8foamtvGkMXOOPymHMH7nlA4vSSZR96gqovbQxJ3DZi1skSqPbc2iYwyz/pasa5iXQrzM7NU02YaTTo71tLHBoVfmqRGx5y/9Mt386eYYv45YNbD7+JVXa04tcoxRtVthg2lpbzZpMh+bPqD/58mwdRr3+ePNHL5FsIWXIfdwbX8tSa4=
+  file: $TRAVIS_BUILD_DIR/android/app/build/outputs/apk/app-release-unsigned.apk
+  on:
+    repo: fullstack-zmrdi/bounty-land-app

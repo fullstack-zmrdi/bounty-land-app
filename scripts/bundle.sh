@@ -1,9 +1,10 @@
 #!/bin/bash
-if $TRAVIS_BUILD_NUMBER
+if [ $TRAVIS_BUILD_NUMBER  ]
 then
   BUILD_NUMBER="$TRAVIS_BUILD_NUMBER"
-fi
+else
   BUILD_NUMBER="100000"
+fi
 
 echo "Creating jsbundle for platform $1 build number $BUILD_NUMBER"
 mkdir -p ".bundles/$1/$BUILD_NUMBER"
