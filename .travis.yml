@@ -1,54 +1,65 @@
 language: android
-sudo: required
-jdk:
-  - oraclejdk8
+matrix:
+  include:
+    - os: linux
+      sudo: required
+      language: android
+      jdk: oraclejdk8
+      android:
+        components:
+          - tools
+          - tools
+          - platform-tools
+          - build-tools-25.0.1
+          - android-25
+          - extra-android-m2repository
+          - extra-google-m2repository
+          - extra-android-support
+          - extra-google-google_play_services
+        licenses:
+          - android-sdk-preview-license-.*
+          - android-sdk-license-.+
+          - google-gdk-license-.+
+          - .+
 
-android:
-  components:
-    - tools
-    - tools
-    - platform-tools
-    - build-tools-25.0.1
-    - android-25
-    - extra-android-m2repository
-    - extra-google-m2repository
-    - extra-android-support
-    - extra-google-google_play_services
-
-  licenses:
-    - 'android-sdk-preview-license-.*'
-    - 'android-sdk-license-.+'
-    - 'google-gdk-license-.+'
-    - '.+'
+    - os: osx
+      osx_image: xcode8.2
+      language: objective-c
+      xcode_project: ios/BountyLandApp.xcodeproj
+      xcode_scheme: BountyLandAppRelease
+      xcode_sdk: iphonesimulator10.1
 
 before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+  - ./scripts/travis-before-cache.sh
 
 cache:
   directories:
-    - $TRAVIS_BUILD_DIR/node_modules
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
-    - $HOME/.android/build-cache
+    - $TRAVIS_BUILD_DIR/node_modules;
+    - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        $HOME/.gradle/caches/;
+        $HOME/.gradle/wrapper/;
+        $HOME/.android/build-cache;
+      fi
 
 before_install:
-  - mkdir "$ANDROID_HOME/licenses" || true
-  - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
-  - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
   - nvm install 7.8.0
-  - node --version
+  - ./scripts/travis-before-install.sh
 
 install:
   - npm install
   - npm install -g react-native-cli
 
+before_script:
+  - ./scripts/travis-before-script.sh
+
 script:
   - npm run lint
   - npm run flow
   - npm run test
-  - npm run bundle:all
-  - cd android && ./gradlew assembleRelease
+  - ./scripts/travis-script.sh
+
+after_success:
+  - ./scripts/travis-after-success.sh
 
 branches:
   only:
@@ -56,12 +67,19 @@ branches:
 
 notifications:
   email:
-   - martycakjakub@gmail.com
+    - martycakjakub@gmail.com
 
 deploy:
   provider: releases
   api_key:
     secure: cbB9681WD6y1r5EqZqDjNzxuU/XLhTCcOh9NfvYf9dRGhzH4cvRmMiyD294hOf40Vz8Rvf3r64kiWKNN1N2SKblz9VfT4hot+hdkTpH/Gyc/2tPimTx1mD4MSPPb5wFBK2SYSKeTKQDsVFpElU6B0Z3AvjX322XiyeL2hKMuUQoS8Vqy+L1hdLfS9woi0fheq1SGECQU6z+N4Oqf8lrBG5lGDYdV92u+r7ICg/PU+OCQlQhx5924QoculMnVe6p0jaSx1Ud63uGIQ9sxH+eb6bAAQkdnv7oMYX0hgWTqov9rhODTyyYYnEZmzrQ48dn2l2u2MrEC9FD/YCU5mNc/jVcZnMrX+oljDfa5Cb5kWb6Mltx19mjn30utMhY6D33LjqfOl/uoThF3lI0CJ36zLwY11Gq7dVZPgL3JCFNVx7dob4OwqPMnK+gKTkj0swGjrqt35RqwEMKdxbwqI25wbaeFsrrL9OG8CqgHaSXxlAWaBQ/KukvmD694ccf8foamtvGkMXOOPymHMH7nlA4vSSZR96gqovbQxJ3DZi1skSqPbc2iYwyz/pasa5iXQrzM7NU02YaTTo71tLHBoVfmqRGx5y/9Mt386eYYv45YNbD7+JVXa04tcoxRtVthg2lpbzZpMh+bPqD/58mwdRr3+ePNHL5FsIWXIfdwbX8tSa4=
-  file: $TRAVIS_BUILD_DIR/android/app/build/outputs/apk/app-release-unsigned.apk
+  file: $TRAVIS_BUILD_DIR/app/build/outputs/apk/app-release-unsigned.apk
   on:
     repo: fullstack-zmrdi/bounty-land-app
+
+env:
+  global:
+    - APP_NAME="BountyLandApp"
+    - 'DEVELOPER_NAME="iPhone Developer: martycakjakub@gmail.com (B9Q968B6W8)"'
+    - secure: XfZ/f5iOBRI9hrwgGrc+2u1RW03k0gzYku5z6zKPDcPyIqEr/TRTserQrZroBF5UUwuamO5T/GEJrv43moUF4ZU+lQc7TK5Xq4ofwpr6S3pL5+hnhTOAVttQ9iwK6tmDQOD0arRqIMWwdpZWN3qpvnzvusIvtEXt9PI3pdlpFuAEigPRPPgOPQiy0LCDW1wJwJogxuXCiRPazs4qHyrBHdzBaPmLNbglxNI2l0ZjJe0pXPS994oRSMCjzuNBhUgRhHS4K052rsebH53SOXci9VIjbCXvQWywaKffI1MUEuw2MqvLi+mO5mdXQXlSLTRDKtv4erb4ZefA5IFV33o0/h7Fc3eCqhwSBVQNbsKM8Cjx7YaBFRscZmrwhKvMPQu24JipUSICevzl1KnmeHTdjFhG1TJTz4Xr2mzIKbZcamEVwvyyNNbp7mq3LMhId3VaBKxy/qZND0M+40aNDh42vMi/pdes54lC8Gzjiy80UfI+wcoKjFOcZdTwE2rnCZ3ECiwC2Z0Necn18JD4z70UefFUvwf/KIS6WXN0SmbCqUjILOiy6kzofqccmBcl2ipdc7b1FD7n5dgN2F4JSYPbUz9Vvl/0gkenVg3zR2Ul3xI/2pkmrNG0LS09YBlDOaDZyUa8yVi54DJ/ar6R5hyRIzx8he2FQ6QKsZDDeK31zDk=
+    - secure: DVGYyD90o+ZbtaY5H4+0qNUe4FRk9dz7SmSg9m84OC6pK144GQp8tjMkm7U4E2cEASTKgzXcT9ecK/Gs88K3bF6kXeiUNTJ1rtQOUaIFeTgod0UxgW0ZsR1FskhxWYlRp2CiEjHAcbFsVb9k66pug87j4T9eG8CkwlPyN3dSHVsmoxBSkZiXhGM0WJx63fLMvUzskbiXMpuKZRTiid2ynpXoZlBrtTievRoyanZlORhHGii0vcVH/QuLuSx7B9CvESJvMhBGmRPUYr14zY+rd0/pznwkQFANXQwmofDfZDl6A2DOlTzgxgNRmY5/9xOtRjdKAjf9QdQ6xF6Ku7nQcFbIK4JkI/+2RNc7scAybOF8kpdQSLNzS+qSIWaddfcioHuocLzPfJ2+oZb9n3Jc4tApuuLlJUV8+Z5xOai2k+TuueNiweDe2uGIfWu0SkL1gG/rAxk+F7RXjqkvcqQjS+6421HZO06l3fTiKsB7qTR8igNfvrXKLmKdjP6N0rebWbimgnBoSJOM5vdeeIVHlJrA6F+TcDAAkq39RJPfvX+HwEiW/vmgDbClXctjWNlDWT+Qd07YgA5iOXw+W3FIh/Qy9r28CNoA6SUvDlYV7q/OgtwvmZsE6ykw5WRjfq2LZifLlNWmain+dcSNwdBKi2tButdHu9ZnJkN5G1CgUN4=

@@ -10,7 +10,10 @@
     "clean": "rm -fr $TMPDIR/react-* && watchman watch-del-all",
     "bundle:android": "./scripts/bundle.sh android",
     "bundle:ios": "./scripts/bundle.sh ios",
-    "bundle:all": "npm run bundle:android && npm run bundle:ios"
+    "bundle:all": "npm run bundle:android && npm run bundle:ios",
+    "release:ios": "./scripts/build-ios.sh BountyLandRelease iphoneos -- archive",
+    "release:android": "cd android && ./gradlew assembleRelease && cd ../",
+    "release:travis": "./scripts/travis-release.sh"
   },
   "dependencies": {
     "@remobile/react-native-toast": "^1.0.6",

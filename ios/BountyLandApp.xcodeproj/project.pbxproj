@@ -17,7 +17,6 @@
 		010F87F46708442789FCDAC4 /* Andale Mono.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F0619E84F4FB4911A8B70F07 /* Andale Mono.ttf */; };
 		02C1DA786B044A9392F91211 /* libAirMaps.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FE63CAA1DF104EB68F5B7893 /* libAirMaps.a */; };
 		08A35266200B4BF3BCB41723 /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ED2744B69574426B93EBCE68 /* Entypo.ttf */; };
-		0C697D92EF724B4F9B1B94D9 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D6CE3C475DB4D35817960CC /* libReact.a */; };
 		0DF9BC394AE0430287F3B229 /* Comic Sans MS.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2E5B89C16BBD411C9BA0025F /* Comic Sans MS.ttf */; };
 		133E29F31AD74F7200F7D852 /* libRCTLinking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 78C398B91ACF4ADC00677621 /* libRCTLinking.a */; };
 		139105C61AF99C1200B5F7CC /* libRCTSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 139105C11AF99BAD00B5F7CC /* libRCTSettings.a */; };
@@ -477,7 +476,6 @@
 		945487391F8F46B79197926B /* Rubik-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Rubik-BoldItalic.ttf"; path = "../node_modules/native-base/Fonts/Rubik-BoldItalic.ttf"; sourceTree = "<group>"; };
 		9466EE71058E4359A58B8F94 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/native-base/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		949817DCAA1C43CEB175EE62 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
-		9D6CE3C475DB4D35817960CC /* libReact.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libReact.a; sourceTree = "<group>"; };
 		ACC64269DF2C416DB3D45252 /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/native-base/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		B0BE698FB61C406F98088C1E /* libRCTFBSDK.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRCTFBSDK.a; sourceTree = "<group>"; };
 		B204C28553C048EC8023284E /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
@@ -546,7 +544,6 @@
 				4D06683194984C5E92BFFF7B /* libRCTFBSDK.a in Frameworks */,
 				246B4BB7AA2C4BF680CE0BAE /* libRCTToast.a in Frameworks */,
 				8F0F41A9E24448208505C1BC /* libReactNativeNavigation.a in Frameworks */,
-				0C697D92EF724B4F9B1B94D9 /* libReact.a in Frameworks */,
 				EC79E6DE914B474EA5998483 /* libRNFetchBlob.a in Frameworks */,
 				F557A528BB7B469D8E9C18AB /* libRNGoogleSignin.a in Frameworks */,
 				D79C1505467F4FC1B9D5E064 /* libRNVectorIcons.a in Frameworks */,
@@ -1024,7 +1021,8 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
-						DevelopmentTeam = 8PG47C63M4;
+						DevelopmentTeam = 7QX6T5JVQH;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Keychain = {
 								enabled = 1;
@@ -1033,10 +1031,12 @@
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = 7QX6T5JVQH;
 						ProvisioningStyle = Automatic;
 					};
 					2D02E48F1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = 7QX6T5JVQH;
 						ProvisioningStyle = Automatic;
 						TestTargetID = 2D02E47A1E0B4A5D006451C7;
 					};
@@ -1500,7 +1500,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			files = (
 			);
 			inputPaths = (
@@ -1510,7 +1510,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/packager/react-native-xcode.sh";
+			shellScript = "../scripts/bundle-ios.sh";
 		};
 		2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1682,45 +1682,46 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = BountyLandApp/BountyLandApp.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
-				DEVELOPMENT_TEAM = 8PG47C63M4;
+				DEVELOPMENT_TEAM = 7QX6T5JVQH;
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)/**",
 					"$(PROJECT_DIR)/**",
 					"$(PROJECT_DIR)/Frameworks/**",
-					"$(PROJECT_DIR)/Frameworks",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)/**",
+					"$(SRCROOT)/**",
+					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast/**",
 					"$(SRCROOT)/../node_modules/react-native-maps/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-google-signin/ios/RNGoogleSignin/**",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-navigation/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager/**",
 					"$(SRCROOT)/../node_modules/react-native-i18n/RNI18n/**",
-					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast/**",
 					"$(SRCROOT)/../node_modules/react-native-fbsdk/ios/RCTFBSDK/**",
-					"$(SRCROOT)/**",
 					"$(SRCROOT)/../node_modules/react-native-fetch-blob/ios/**",
-					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
-					"$(SRCROOT)/../node_modules/react-native-linear-gradient/BVLinearGradient",
+					"$(SRCROOT)/../node_modules/react-native-linear-gradient/BVLinearGradient/**",
 				);
 				INFOPLIST_FILE = BountyLandApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)/**",
 					"$(PROJECT_DIR)/**",
-					"$(PROJECT_DIR)",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.jajija.bountyland;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jajija.bountylandapp;
 				PRODUCT_NAME = BountyLandApp;
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -1730,45 +1731,46 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = BountyLandApp/BountyLandApp.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: martycakjakub@gmail.com (B9Q968B6W8)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8PG47C63M4;
+				DEVELOPMENT_TEAM = 7QX6T5JVQH;
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)/**",
 					"$(PROJECT_DIR)/**",
 					"$(PROJECT_DIR)/Frameworks/**",
-					"$(PROJECT_DIR)/Frameworks",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)/**",
+					"$(SRCROOT)/**",
+					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast/**",
 					"$(SRCROOT)/../node_modules/react-native-maps/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-google-signin/ios/RNGoogleSignin/**",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-navigation/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager/**",
 					"$(SRCROOT)/../node_modules/react-native-i18n/RNI18n/**",
-					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast/**",
 					"$(SRCROOT)/../node_modules/react-native-fbsdk/ios/RCTFBSDK/**",
-					"$(SRCROOT)/**",
 					"$(SRCROOT)/../node_modules/react-native-fetch-blob/ios/**",
-					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
-					"$(SRCROOT)/../node_modules/react-native-linear-gradient/BVLinearGradient",
+					"$(SRCROOT)/../node_modules/react-native-linear-gradient/BVLinearGradient/**",
 				);
 				INFOPLIST_FILE = BountyLandApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)/**",
 					"$(PROJECT_DIR)/**",
-					"$(PROJECT_DIR)",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.jajija.bountyland;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jajija.bountylandapp;
 				PRODUCT_NAME = BountyLandApp;
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -1944,6 +1946,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = 7QX6T5JVQH;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1983,8 +1986,10 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: martycakjakub@gmail.com (B9Q968B6W8)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: martycakjakub@gmail.com (B9Q968B6W8)";
 				COPY_PHASE_STRIP = YES;
+				DEVELOPMENT_TEAM = 7QX6T5JVQH;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
