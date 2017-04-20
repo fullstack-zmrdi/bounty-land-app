@@ -1,6 +1,7 @@
 #!/bin/bash
 echo "$TRAVIS_OS_NAME"
 node --version
+gem install travis -v 1.8.8 --no-rdoc --no-ri
 if [ "$TRAVIS_OS_NAME" == "linux" ]; then
   echo "Accept Android licenses"
   mkdir "$ANDROID_HOME/licenses" || true
