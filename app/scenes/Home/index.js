@@ -1,14 +1,15 @@
 /* @flow */
 import * as firebase from 'firebase'
-import map from 'lodash/map'
-import colors from 'material-colors'
-import React, { Component } from 'react'
-import { InteractionManager, Platform, StyleSheet, View, StatusBar } from 'react-native'
-import MapView from 'react-native-maps'
 
+import { InteractionManager, Platform, StatusBar, StyleSheet, View } from 'react-native'
+import React, { Component } from 'react'
+
+import type { Challenge } from '../../typedef'
+import MapView from 'react-native-maps'
+import colors from 'material-colors'
+import map from 'lodash/map'
 import plusIcon from '../../images/ic_add_white_24dp.png'
 import searchIcon from '../../images/ic_search_black_24dp.png'
-import type { Challenge } from '../../typedef'
 
 type PropsType = {
   navigator: Object
@@ -144,6 +145,7 @@ class Home extends Component<void, PropsType, StateType> {
           {
             map(this.state.challenges, (challenge) => (
               <MapView.Marker
+                key={challenge.id}
                 onPress={this.onChallengePress.bind(this, challenge)}
                 coordinate={{ latitude: challenge.location.latitude, longitude: challenge.location.longitude }}
                 title={challenge.name}

@@ -1,13 +1,15 @@
-import React, {Component} from 'react'
-import { View, Image, LayoutAnimation, Platform, StatusBar } from 'react-native'
 import * as firebase from 'firebase'
-import { Container, Content, Text, Segment, H1, H2, Button, Row } from 'native-base'
-import I18n from 'react-native-i18n'
-import colors from 'material-colors'
-import LinearGradient from 'react-native-linear-gradient'
 
-import { iconsMap } from '../../images/Icons'
+import { Button, Container, Content, H1, H2, Row, Segment, Text } from 'native-base'
+import { Image, LayoutAnimation, Platform, StatusBar, StyleSheet, View } from 'react-native'
+import React, {Component} from 'react'
+
 import Auth from '../../auth'
+import I18n from 'react-native-i18n'
+import LinearGradient from 'react-native-linear-gradient'
+import Logo from '../../components/Logo'
+import colors from 'material-colors'
+import { iconsMap } from '../../images/Icons'
 
 class ChallengeDetail extends Component {
   static navigatorStyle = {
@@ -26,15 +28,16 @@ class ChallengeDetail extends Component {
     StatusBar.setBarStyle('light-content', true)
     Auth.getProfile()
     .then((profile) => {
-      const hasLike = this.props.challenge.likes.find((likeId) => profile.id === likeId)
-      this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this))
-      this.props.navigator.setButtons({
+      const { navigator, challenge } = this.props
+      const isLiked = challenge.likes && challenge.likes.find((likeId) => profile.id === likeId)
+      navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this))
+      navigator.setButtons({
         leftButtons: [{
           id: 'back',
           color: colors.white,
           icon: iconsMap['ios-arrow-back']
         }],
-        rightButtons: this.getRightButtons(hasLike)
+        rightButtons: this.getRightButtons(isLiked)
       })
       this.loadChallenger()
     })
@@ -190,7 +193,8 @@ class ChallengeDetail extends Component {
   loadChallenger (): void {
     const ref = firebase.database().ref(`users/${this.props.challenge.createdBy}`)
     return ref.once('value', (snapshot) => {
-      this.setState({ challenger: snapshot.val() })
+      const challenger = snapshot.val()
+      this.setState({ challenger })
     })
   }
 
@@ -232,26 +236,35 @@ class ChallengeDetail extends Component {
   }
 
   // Render cover image
-  renderCoverImage (): Image {
-    return this.props.challenge.photo
-    ? (
-      <Image
-        source={{ uri: this.props.challenge.photo }}
-        style={{ backgroundColor: colors.grey['300'], top: 0, left: 0, right: 0, height: 360, flex: 1, resizeMode: 'cover' }} />
-    ) : null
+  renderCoverImage (): View {
+    return (
+      <View style={styles.coverContainer}>
+        {this.props.challenge.photo
+        ? (
+          <Image
+            source={{ uri: this.props.challenge.photo }}
+            style={styles.coverImage} />
+        ) : (
+          <Logo size={150} style={{ alignSelf: 'center', marginTop: 65 }} />
+        )}
+      </View>
+    )
   }
 
   // Render title with gradient background
   renderTitle (): LinearGradient {
     return (
       <LinearGradient
-        colors={['transparent', 'rgba(255,255,255,0.6)', '#fff']}
-        style={{ top: -120, flex: 1, height: 120, justifyContent: 'flex-end' }}>
+        colors={['rgba(255,255,255,0)', 'rgba(255,255,255,0.6)', '#fff']}
+        style={styles.titleContainer}>
         <View>
-          <H1 style={{ left: 16, fontSize: 60, lineHeight: 60, color: colors.black, fontWeight: 'bold' }}>
+          <H1
+            style={StyleSheet.flatten(styles.title)}
+            numberOfLines={1}
+            adjustsFontSizeToFit>
             {this.props.challenge.name}
           </H1>
-          <H2 style={{ left: 20, color: colors.darkText.secondary }}>
+          <H2 style={StyleSheet.flatten(styles.subtitle)}>
             {I18n.t(this.props.challenge.category)}
           </H2>
         </View>
@@ -262,7 +275,7 @@ class ChallengeDetail extends Component {
   // Render navigation segment
   renderSegment (): Segment {
     return (
-      <Segment style={{ borderBottomWidth: 0, marginBottom: 12 }}>
+      <Segment style={StyleSheet.flatten(styles.segment)}>
         <Button first active>
           <Text>{I18n.t('detail')}</Text>
         </Button>
@@ -276,25 +289,21 @@ class ChallengeDetail extends Component {
   // Render description and bounty
   renderDescriptionAndBounty (): Row {
     return (
-      <Row
-        style={{ marginBottom: 12, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: colors.darkText.dividers }}>
-        <View style={{ flex: 0.67 }}>
-          {this.state.showDescription
-          ? (
-            <Text>
-              {this.props.challenge.description}
-            </Text>
-          ) : null}
+      <Row style={StyleSheet.flatten(styles.descriptionContainer)}>
+        <View style={{ flex: 0.65, paddingRight: 16 }}>
+          <Text numberOfLines={this.state.showDescription ? null : 1}>
+            {this.props.challenge.description}
+          </Text>
           <Button
             onPress={() => this.setState({ showDescription: !this.state.showDescription })}
             style={{ paddingLeft: 0 }}
             transparent>
             {/* <Icon color='' name={this.getDescriptionIcon()} size={16} /> */}
-            <Text> {I18n.t('toggle_description')} ...</Text>
+            <Text> {I18n.t('full_description')} ...</Text>
           </Button>
         </View>
-        <View style={{ flex: 0.33 }}>
-          <Text style={{ color: colors.darkText.secondary, textAlign: 'right', paddingBottom: 5 }}>
+        <View style={styles.bountyContainer}>
+          <Text style={StyleSheet.flatten(styles.bountyLabel)}>
             {I18n.t('total_bounty')}
           </Text>
           <Row style={{ alignSelf: 'flex-end', alignItems: 'center' }}>
@@ -324,7 +333,7 @@ class ChallengeDetail extends Component {
   renderChallenger (): Row {
     return this.state.challenger
     ? (
-      <Row style={{ alignItems: 'center', marginBottom: 12, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: colors.darkText.dividers }}>
+      <Row style={StyleSheet.flatten([{ alignItems: 'center' }, styles.descriptionContainer ])}>
         <Row>
           <Image
             source={{ uri: this.state.challenger.user.picture.data.url }}
@@ -380,5 +389,57 @@ class ChallengeDetail extends Component {
     )
   }
 }
+
+const styles = StyleSheet.create({
+  coverContainer: {
+    backgroundColor: colors.cyan['300'],
+    height: 360,
+    left: 0,
+    right: 0,
+    top: 0
+  },
+  coverImage: {
+    flex: 1,
+    resizeMode: 'cover'
+  },
+  titleContainer: {
+    flex: 1,
+    height: 120,
+    justifyContent: 'flex-end',
+    top: -120
+  },
+  title: {
+    color: colors.black,
+    fontSize: 60,
+    fontWeight: 'bold',
+    lineHeight: 60,
+    overflow: 'hidden',
+    paddingHorizontal: 16
+  },
+  subtitle: {
+    color: colors.darkText.secondary,
+    left: 20
+  },
+  segment: {
+    borderBottomWidth: 0,
+    marginBottom: 12
+  },
+  descriptionContainer: {
+    borderBottomColor: colors.darkText.dividers,
+    borderBottomWidth: 1,
+    marginBottom: 12,
+    paddingBottom: 12
+  },
+  bountyContainer: {
+    flex: 0.35,
+    height: 60,
+    overflow: 'hidden'
+  },
+  bountyLabel: {
+    color: colors.darkText.secondary,
+    paddingBottom: 5,
+    textAlign: 'right'
+  }
+})
 
 export default ChallengeDetail
