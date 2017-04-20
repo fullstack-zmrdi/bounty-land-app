@@ -59,6 +59,7 @@ notifications:
   email:
   - martycakjakub@gmail.com
 deploy:
+  skip_cleanup: true
   provider: releases
   api_key: $GITHUB_TOKEN
   file:
