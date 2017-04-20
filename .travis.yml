@@ -58,18 +58,6 @@ branches:
 notifications:
   email:
   - martycakjakub@gmail.com
-deploy:
-  skip_cleanup: true
-  provider: releases
-  api_key: $GITHUB_TOKEN
-  file:
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      android/app/build/outputs/apk/app-release-unsigned.apk;
-    else
-      ios/build/Products/BountyLandAppRelease.ipa;
-    fi
-  on:
-    repo: fullstack-zmrdi/bounty-land-app
 env:
   global:
   - APP_NAME="BountyLandApp"
