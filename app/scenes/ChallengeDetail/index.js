@@ -333,7 +333,7 @@ class ChallengeDetail extends Component {
   renderChallenger (): Row {
     return this.state.challenger
     ? (
-      <Row style={StyleSheet.flatten([{ alignItems: 'center' }, styles.descriptionContainer ])}>
+      <Row style={StyleSheet.flatten([{ alignItems: 'center' }, styles.descriptionContainer])}>
         <Row>
           <Image
             source={{ uri: this.state.challenger.user.picture.data.url }}

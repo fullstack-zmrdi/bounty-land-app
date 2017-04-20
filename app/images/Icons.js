@@ -1,5 +1,5 @@
-import { PixelRatio } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { PixelRatio } from 'react-native'
 
 const navIconSize = (__DEV__ === false && Platform.OS === 'android') ? PixelRatio.getPixelSizeForLayoutSize(40) : 40; // eslint-disable-line
 const replaceSuffixPattern = /--(active|big|small|very-big)/g
@@ -10,7 +10,9 @@ const icons = {
   'ios-heart': [30],
   'ios-heart-outline': [30],
   'ios-close': [40],
-  'ios-share-outline': [30]
+  'ios-share-outline': [30],
+  'ios-undo': [30],
+  'ios-reverse-camera': [30]
 }
 
 const iconsMap = {}

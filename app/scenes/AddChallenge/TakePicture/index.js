@@ -1,11 +1,13 @@
 /* @flow */
-import { Text } from 'native-base'
+import { Image, Platform, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native'
 import React, { Component } from 'react'
-import { StyleSheet, View, TouchableOpacity, Platform, Image } from 'react-native'
+
 import Camera from 'react-native-camera'
 import I18n from 'react-native-i18n'
-import colors from 'material-colors'
 import Icon from 'react-native-vector-icons/Ionicons'
+import { Text } from 'native-base'
+import colors from 'material-colors'
+import { iconsMap } from '../../../images/Icons'
 
 type PropsType = {
   navigator: Object
@@ -13,14 +15,74 @@ type PropsType = {
 
 type StateType = {
   photo: ?{ path: string },
-  photoTaken: boolean
+  photoTaken: boolean,
+  cameraType: string
 }
 
 class TakePicture extends Component<void, PropsType, StateType> {
   camera: Camera;
+  static navigatorStyle = {
+    drawUnderNavBar: true,
+    navBarTranslucent: true,
+    navBarTransparent: true,
+    navBarButtonColor: colors.white
+  }
+
   state = {
     photoTaken: false,
-    photo: null
+    photo: null,
+    cameraType: Camera.constants.Type.back
+  }
+
+  reverseCameraButton = {
+    id: 'reverse-camera',
+    icon: iconsMap['ios-reverse-camera'],
+    color: colors.white
+  }
+
+  componentDidMount (): void {
+    StatusBar.setHidden(true)
+    this.showBackButton()
+    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this))
+  }
+
+  // Handle navigator event
+  onNavigatorEvent (event: Object): void {
+    if (event.id === 'back') {
+      this.props.navigator.dismissModal()
+    }
+
+    if (event.id === 'undo') {
+      this.takeAnotherPhoto()
+    }
+
+    if (event.id === 'reverse-camera') {
+      this.toggleCamera()
+    }
+  }
+
+  // Show back button in nav bar
+  showBackButton (): void {
+    this.props.navigator.setButtons({
+      leftButtons: [{
+        id: 'back',
+        color: colors.white,
+        icon: iconsMap['ios-arrow-back']
+      }],
+      rightButtons: [this.reverseCameraButton]
+    })
+  }
+
+  // Show undo button in navbar
+  showUndoButton (): void {
+    this.props.navigator.setButtons({
+      leftButtons: [{
+        id: 'undo',
+        color: colors.white,
+        icon: iconsMap['ios-undo']
+      }],
+      rightButtons: [this.reverseCameraButton]
+    })
   }
 
   // Take picture with camera
@@ -30,6 +92,7 @@ class TakePicture extends Component<void, PropsType, StateType> {
     this.camera.capture({ metadata: options })
     .then((data) => {
       // console.log(data)
+      this.showUndoButton()
       this.setState({ photo: data, photoTaken: true })
     })
     .catch((err) => console.error(err))
@@ -67,15 +130,19 @@ class TakePicture extends Component<void, PropsType, StateType> {
 
   // Take new photo
   takeAnotherPhoto (): void {
+    this.showBackButton()
     this.setState({
       photoTaken: false,
       photo: null
     })
   }
 
-  // TODO: Implement camera toggle
+  // Toggle camera front <-> back
   toggleCamera (): void {
-
+    const cameraType = this.state.cameraType === Camera.constants.Type.back
+    ? Camera.constants.Type.front
+    : Camera.constants.Type.back
+    this.setState({ cameraType })
   }
 
   // Display taken photo and controls to continue/take another
@@ -85,14 +152,6 @@ class TakePicture extends Component<void, PropsType, StateType> {
         <Image
           source={{ uri: this.state.photo && this.state.photo.path }}
           style={{ flex: 1, resizeMode: 'cover' }} />
-        <TouchableOpacity
-          onPress={this.takeAnotherPhoto.bind(this)}
-          style={styles.takeAnotherPhotoButton}>
-          <Icon
-            color={colors.white}
-            size={32}
-            name='ios-undo' />
-        </TouchableOpacity>
         <TouchableOpacity
           onPress={this.onConfirmPhotoPress.bind(this)}
           style={styles.confirmPhotoButton}>
@@ -124,8 +183,13 @@ class TakePicture extends Component<void, PropsType, StateType> {
             size={32}
             name='ios-camera-outline' />
         </TouchableOpacity>
-        <TouchableOpacity onPress={this.showCameraRoll.bind(this)}>
-          <Text>{I18n.t('camera_roll')}</Text>
+        <TouchableOpacity
+          style={{ backgroundColor: 'transparent' }}
+          /* onPress={this.showCameraRoll.bind(this)} */>
+          <Icon
+            color={colors.white}
+            size={24}
+            name='ios-folder' />
         </TouchableOpacity>
       </View>
     )
@@ -137,6 +201,7 @@ class TakePicture extends Component<void, PropsType, StateType> {
       <Camera
         ref={(cam) => { this.camera = cam }}
         captureAudio={false}
+        type={this.state.cameraType}
         captureTarget={Camera.constants.CaptureTarget.disk}
         style={styles.preview}
         aspect={Camera.constants.Aspect.fill}>
@@ -145,7 +210,7 @@ class TakePicture extends Component<void, PropsType, StateType> {
     )
   }
 
-  render () {
+  render (): View {
     return (
       <View style={styles.container}>
         {this.state.photoTaken && this.state.photo
@@ -168,7 +233,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     height: 80,
     alignItems: 'center',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
     position: 'absolute',
     left: 0,
     bottom: 0,

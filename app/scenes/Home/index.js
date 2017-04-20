@@ -114,13 +114,7 @@ class Home extends Component<void, PropsType, StateType> {
 
   // Open camera to take picture for new challenge
   onAddChallengePress (): void {
-    this.props.navigator.showModal({
-      screen: 'TAKE_PICTURE',
-      navigatorStyle: {
-        navBarHidden: true
-      },
-      passProps: {}
-    })
+    this.props.navigator.showModal({ screen: 'TAKE_PICTURE' })
   }
 
   // Update region on user geolocation change
