@@ -1,12 +1,14 @@
+import * as firebase from 'firebase'
+
 /* @flow */
 import { AccessToken, GraphRequest, GraphRequestManager, LoginManager } from 'react-native-fbsdk'
 import { AsyncStorage, DeviceEventEmitter, Platform } from 'react-native' //eslint-disable-line
-import { GoogleSignin } from 'react-native-google-signin'
-import * as firebase from 'firebase'
+import type { AuthData, Profile, User } from './typedef'
 
-import { googleSignIn } from './config'
-import type { Profile, AuthData, User } from './typedef'
 import type FBAccessToken from 'react-native-fbsdk/js/FBAccessToken.js'
+import { GoogleSignin } from 'react-native-google-signin'
+import { googleSignIn } from './config'
+
 export const AUTH_CHANGE_EVENT = 'authChange'
 
 export const LOGIN_TYPES = {
@@ -89,7 +91,7 @@ class Auth {
       return ref.once('value', (snapshot) => {
         if (snapshot.exists()) {
           // console.log('user exists', authData.user.id)
-          return ref.set({ lastLogin: Date.now() })
+          return ref.update({ lastLogin: Date.now() })
         }
         // console.log('saving user', authData.user.id)
         return ref.set({ type: authData.type, user: authData.user, lastLogin: Date.now() })
