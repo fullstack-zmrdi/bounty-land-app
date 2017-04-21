@@ -1,30 +1,38 @@
+/* @flow */
 import * as firebase from 'firebase'
 
-import { Button, Container, Content, H1, H2, Row, Segment, Text } from 'native-base'
+import { Button, Container, Content, Row, Segment, Text, getTheme } from 'native-base'
 import { Image, LayoutAnimation, Platform, StatusBar, StyleSheet, View } from 'react-native'
 import React, {Component} from 'react'
 
 import Auth from '../../auth'
+import Cover from './Cover'
 import I18n from 'react-native-i18n'
-import LinearGradient from 'react-native-linear-gradient'
-import Logo from '../../components/Logo'
+import type { Profile } from '../../typedef'
 import colors from 'material-colors'
 import { iconsMap } from '../../images/Icons'
 
-class ChallengeDetail extends Component {
-  static navigatorStyle = {
-    drawUnderNavBar: true,
-    navBarTranslucent: true,
-    navBarTransparent: true,
-    navBarButtonColor: colors.white
-  }
+type PropsType = {
+  navigator: Object,
+  challenge: Object
+}
 
+type StateType = {
+  challenger: ?{ user: Object },
+  showDescription: boolean
+}
+
+class ChallengeDetail extends Component<void, PropsType, StateType> {
+  navBarHidden: boolean;
   state = {
     challenger: null,
     showDescription: false
   }
 
-  componentDidMount () {
+  componentDidMount (): void {
+    const theme = getTheme()
+    theme['NativeBase.Segment'].borderColor = colors.cyan['500']
+    console.log('native base theme', theme)
     StatusBar.setBarStyle('light-content', true)
     Auth.getProfile()
     .then((profile) => {
@@ -34,7 +42,7 @@ class ChallengeDetail extends Component {
       navigator.setButtons({
         leftButtons: [{
           id: 'back',
-          color: colors.white,
+          buttonColor: colors.white,
           icon: iconsMap['ios-arrow-back']
         }],
         rightButtons: this.getRightButtons(isLiked)
@@ -43,15 +51,16 @@ class ChallengeDetail extends Component {
     })
   }
 
-  componentWillUpdate () {
+  componentWillUpdate (): void {
     LayoutAnimation.easeInEaseOut()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount (): void {
     StatusBar.setBarStyle('dark-content', true)
   }
 
-  onNavigatorEvent (event) {
+  // Handle navigator event
+  onNavigatorEvent (event: Object): void {
     if (event.id === 'back') {
       this.onBackPress()
     }
@@ -65,14 +74,23 @@ class ChallengeDetail extends Component {
     }
   }
 
+  // Get like icon path
+  getLikeIcon (like: boolean): string {
+    if (like) {
+      return Platform.OS === 'android' ? iconsMap['md-heart'] : iconsMap['ios-heart']
+    } else {
+      return Platform.OS === 'android' ? iconsMap['md-heart-outline'] : iconsMap['ios-heart-outline']
+    }
+  }
+
   // Get right buttons
   getRightButtons (hasLike: boolean): Array<Object> {
     return [{
       id: 'like',
-      icon: hasLike ? iconsMap['ios-heart'] : iconsMap['ios-heart-outline']
+      icon: this.getLikeIcon(hasLike)
     }, {
       id: 'share',
-      icon: iconsMap['ios-share-outline']
+      icon: Platform.OS === 'android' ? iconsMap['md-share'] : iconsMap['ios-share-outline']
     }]
   }
 
@@ -192,14 +210,14 @@ class ChallengeDetail extends Component {
   // Load challenger info
   loadChallenger (): void {
     const ref = firebase.database().ref(`users/${this.props.challenge.createdBy}`)
-    return ref.once('value', (snapshot) => {
-      const challenger = snapshot.val()
+    return ref.once('value', (snapshot: Object) => {
+      const challenger: Object = snapshot.val()
       this.setState({ challenger })
     })
   }
 
   // Add participant to challenge
-  addParticipant (profile, challenge, ref): void {
+  addParticipant (profile: Profile, challenge: Object, ref: Object): void {
     if (!challenge.participants) {
       challenge.participants = []
     }
@@ -209,7 +227,7 @@ class ChallengeDetail extends Component {
   }
 
   // Add like to challenge
-  addLike (profile, challenge, ref): void {
+  addLike (profile: Profile, challenge: Object, ref: Object): void {
     ref.update({
       likeCount: challenge.likeCount + 1,
       likes: [ ...challenge.likes, profile.id ]
@@ -220,7 +238,7 @@ class ChallengeDetail extends Component {
   }
 
   // Remove like from challenge
-  removeLike (profile, challenge, ref): void {
+  removeLike (profile: Profile, challenge: Object, ref: Object): void {
     ref.update({
       likeCount: challenge.likeCount - 1,
       likes: challenge.likes.filter((userId) => userId !== profile.id)
@@ -237,39 +255,13 @@ class ChallengeDetail extends Component {
 
   // Render cover image
   renderCoverImage (): View {
-    return (
-      <View style={styles.coverContainer}>
-        {this.props.challenge.photo
-        ? (
-          <Image
-            source={{ uri: this.props.challenge.photo }}
-            style={styles.coverImage} />
-        ) : (
-          <Logo size={150} style={{ alignSelf: 'center', marginTop: 65 }} />
-        )}
-      </View>
-    )
-  }
-
-  // Render title with gradient background
-  renderTitle (): LinearGradient {
-    return (
-      <LinearGradient
-        colors={['rgba(255,255,255,0)', 'rgba(255,255,255,0.6)', '#fff']}
-        style={styles.titleContainer}>
-        <View>
-          <H1
-            style={StyleSheet.flatten(styles.title)}
-            numberOfLines={1}
-            adjustsFontSizeToFit>
-            {this.props.challenge.name}
-          </H1>
-          <H2 style={StyleSheet.flatten(styles.subtitle)}>
-            {I18n.t(this.props.challenge.category)}
-          </H2>
-        </View>
-      </LinearGradient>
-    )
+    if (Platform.OS === 'android') {
+      return null
+    } else {
+      return (
+        <Cover />
+      )
+    }
   }
 
   // Render navigation segment
@@ -330,46 +322,50 @@ class ChallengeDetail extends Component {
   }
 
   // Render challenger
-  renderChallenger (): Row {
-    return this.state.challenger
-    ? (
-      <Row style={StyleSheet.flatten([{ alignItems: 'center' }, styles.descriptionContainer])}>
-        <Row>
-          <Image
-            source={{ uri: this.state.challenger.user.picture.data.url }}
-            style={{ marginRight: 16, width: 40, height: 40, resizeMode: 'contain', borderRadius: 20 }} />
-          <View>
-            <Text style={{ color: colors.darkText.secondary }}>
-              {I18n.t('challenger')}
-            </Text>
-            <Text style={{ fontWeight: 'bold', fontSize: 18 }}>
-              {this.state.challenger.user.name}
-            </Text>
-          </View>
+  renderChallenger (): ?Row {
+    if (this.state.challenger && this.state.challenger.user) {
+      return (
+        <Row style={StyleSheet.flatten([{ alignItems: 'center' }, styles.descriptionContainer])}>
+          <Row>
+            <Image
+              source={{ uri: this.state.challenger.user.picture.data.url }}
+              style={{ marginRight: 16, width: 40, height: 40, resizeMode: 'contain', borderRadius: 20 }} />
+            <View>
+              <Text style={{ color: colors.darkText.secondary }}>
+                {I18n.t('challenger')}
+              </Text>
+              <Text style={{ fontWeight: 'bold', fontSize: 18 }}>
+                {this.state.challenger && this.state.challenger.user.name}
+              </Text>
+            </View>
+          </Row>
+          <Text>{this.state.challenger && (this.state.challenger.user.karma || 0)}</Text>
         </Row>
-        <Text>{this.state.challenger.karma || 0}</Text>
-      </Row>
-    ) : null
+      )
+    } else {
+      return null
+    }
   }
 
   // Render footer
-  renderFooter (): Row {
-    if (!this.state.challenger) {
+  renderFooter (): ?Row {
+    if (this.state.challenger && this.state.challenger.user) {
+      return (
+        <Row>
+          <Button transparent onPress={this.onRaiseBountyPress.bind(this)}>
+            <Text>{I18n.t('raise_bounty').toUpperCase()}</Text>
+          </Button>
+          {this.props.challenge.createdBy !== (this.state.challenger && this.state.challenger.user.id)
+          ? (
+            <Button transparent onPress={this.onParticipatePress.bind(this)}>
+              <Text>{I18n.t('participate').toUpperCase()}</Text>
+            </Button>
+          ) : null}
+        </Row>
+      )
+    } else {
       return null
     }
-    return (
-      <Row>
-        <Button transparent onPress={this.onRaiseBountyPress.bind(this)}>
-          <Text>{I18n.t('raise_bounty').toUpperCase()}</Text>
-        </Button>
-        {this.props.challenge.createdBy !== this.state.challenger.user.id
-        ? (
-          <Button transparent onPress={this.onParticipatePress.bind(this)}>
-            <Text>{I18n.t('participate').toUpperCase()}</Text>
-          </Button>
-        ) : null}
-      </Row>
-    )
   }
 
   render () {
@@ -377,8 +373,7 @@ class ChallengeDetail extends Component {
       <Container>
         <Content onScroll={this.onScroll.bind(this)}>
           {this.renderCoverImage()}
-          {this.renderTitle()}
-          <View style={{ top: -120, paddingHorizontal: 16, paddingVertical: 12 }}>
+          <View style={{ paddingHorizontal: 16, paddingVertical: 12 }}>
             {this.renderSegment()}
             {this.renderDescriptionAndBounty()}
             {this.renderChallenger()}
@@ -391,35 +386,6 @@ class ChallengeDetail extends Component {
 }
 
 const styles = StyleSheet.create({
-  coverContainer: {
-    backgroundColor: colors.cyan['300'],
-    height: 360,
-    left: 0,
-    right: 0,
-    top: 0
-  },
-  coverImage: {
-    flex: 1,
-    resizeMode: 'cover'
-  },
-  titleContainer: {
-    flex: 1,
-    height: 120,
-    justifyContent: 'flex-end',
-    top: -120
-  },
-  title: {
-    color: colors.black,
-    fontSize: 60,
-    fontWeight: 'bold',
-    lineHeight: 60,
-    overflow: 'hidden',
-    paddingHorizontal: 16
-  },
-  subtitle: {
-    color: colors.darkText.secondary,
-    left: 20
-  },
   segment: {
     borderBottomWidth: 0,
     marginBottom: 12

@@ -1,22 +1,23 @@
-import About from './About'
-import ChallengeDetail from './ChallengeDetail'
-import RaiseBountyModal from './ChallengeDetail/RaiseBounty'
-import ChallengeMessages from './ChallengeDetail/Messages'
+import {
+  AddChallengeDetails,
+  ChallengeAdded,
+  SelectLocation,
+  TakePicture
+} from './AddChallenge'
 
+import About from './About'
+import CameraRoll from './CameraRoll'
+import ChallengeDetail from './ChallengeDetail'
+import ChallengeMessages from './ChallengeDetail/Messages'
 import Challenges from './Challenges'
+import Cover from './ChallengeDetail/Cover'
 import Drawer from './Drawer'
 import Home from './Home'
 import { Navigation } from 'react-native-navigation'
 import Profile from './Profile'
+import RaiseBountyModal from './ChallengeDetail/RaiseBounty'
 import SignIn from './SignIn'
-import {
-  TakePicture,
-  SelectLocation,
-  ChallengeAdded,
-  AddChallengeDetails
-} from './AddChallenge'
 import Wallet from './Wallet'
-import CameraRoll from './CameraRoll'
 
 export const registerScreens = () => {
   Navigation.registerComponent('SIGN_IN', () => SignIn)
@@ -30,6 +31,7 @@ export const registerScreens = () => {
   Navigation.registerComponent('CHALLENGE_ADDED', () => ChallengeAdded)
   Navigation.registerComponent('CAMERA_ROLL', () => CameraRoll)
   Navigation.registerComponent('CHALLENGE_DETAIL', () => ChallengeDetail)
+  Navigation.registerComponent('COVER', () => Cover)
   Navigation.registerComponent('CHALLENGE_MESSAGES', () => ChallengeMessages)
   Navigation.registerComponent('RAISE_BOUNTY', () => RaiseBountyModal)
   Navigation.registerComponent('CHALLENGES', () => Challenges)

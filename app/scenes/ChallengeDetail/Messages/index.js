@@ -1,26 +1,51 @@
+/* @flow */
 import * as firebase from 'firebase'
-import { Row, Text } from 'native-base'
-import { StyleSheet, View, ScrollView, Image, LayoutAnimation, TextInput, Keyboard, TouchableOpacity } from 'react-native'
+
+import { Image, Keyboard, LayoutAnimation, Platform, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { Component } from 'react'
-import { navigatorStyle } from '../../../theme'
-import { iconsMap } from '../../../images/Icons'
+import { Row, Text } from 'native-base'
+
 import Auth from '../../../auth'
-import colors from 'material-colors'
 import I18n from 'react-native-i18n'
 import Icon from 'react-native-vector-icons/Ionicons'
 import ObjectId from 'bson-objectid'
+import colors from 'material-colors'
+import { iconsMap } from '../../../images/Icons'
 import map from 'lodash/map'
+import { navigatorStyle } from '../../../theme'
 
-class ChallengeMessages extends Component {
+import type { Profile } from '../../../typedef'
+
+type PropsType = {
+  navigator: Object,
+  challenge: null
+}
+
+type StateType = {
+  message: string,
+  messages: Object,
+  members: Object,
+  profile: ?Profile,
+  keyboardHeight: number
+}
+
+class ChallengeMessages extends Component<void, PropsType, StateType> {
+  keyboardWillShowSub: Object;
+  keyboardWillHideSub: Object;
+  scrollView: ScrollView;
   static navigatorStyle = navigatorStyle
   state = {
     message: '',
     messages: {},
-    members: {}
+    members: {},
+    profile: null,
+    keyboardHeight: 0
   }
 
-  componentDidMount () {
-    console.log('did mount')
+  /*********************/
+  /* Lifecycle methods */
+  /*********************/
+  componentDidMount (): void {
     Auth.getProfile()
     .then((profile) => {
       this.setState({ profile })
@@ -28,74 +53,33 @@ class ChallengeMessages extends Component {
       this.props.navigator.setButtons({
         leftButtons: [{
           id: 'back',
-          color: colors.white,
-          icon: iconsMap['ios-arrow-back']
+          buttonColor: colors.white,
+          icon: Platform.OS === 'ios' && iconsMap['ios-arrow-back']
         }]
       })
     })
     this.loadMessages()
   }
 
-  componentWillMount () {
-    this.keyboardWillShowSub = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow)
-    this.keyboardWillHideSub = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide)
+  // Add keyboard listeners
+  componentWillMount (): void {
+    this.keyboardWillShowSub = Keyboard.addListener('keyboardWillShow', this.onKeyboardWillShow.bind(this))
+    this.keyboardWillHideSub = Keyboard.addListener('keyboardWillHide', this.onKeyboardWillHide.bind(this))
   }
 
-  componentWillUnmount () {
+  // Remove keyboard listeners
+  componentWillUnmount (): void {
     this.keyboardWillShowSub.remove()
     this.keyboardWillHideSub.remove()
   }
 
-  componentWillUpdate () {
+  // Setup layout animation
+  componentWillUpdate (): void {
     LayoutAnimation.easeInEaseOut()
   }
 
-  keyboardWillShow = (event) => {
-    this.setState({ keyboardHeight: event.endCoordinates.height })
-    this.scrollView.scrollToEnd({ animated: true })
-  }
-
-  keyboardWillHide = (event) => {
-    this.setState({ keyboardHeight: 0 })
-  }
-
-  onNavigatorEvent (event) {
-    if (event.id === 'back') {
-      this.onBackPress()
-    }
-  }
-
-  // Return to previous screen
-  onBackPress (): void {
-    this.props.navigator.dismissModal()
-  }
-
-  onMessageChange (val: string) {
-    this.setState({ message: val })
-  }
-
-  onSendMessagePress () {
-    this.sendMessage(this.state.message)
-    .then(() => {
-      this.setState({ message: '' })
-    })
-  }
-
-  sendMessage (message: string) {
-    if (!message) {
-      return
-    }
-    const messageId = ObjectId().toString()
-    const ref = firebase.database().ref(`messages/${this.props.challenge.id}/${messageId}`)
-    return ref.set({
-      id: messageId,
-      text: message,
-      createdBy: this.state.profile.id,
-      createdAt: Date.now()
-    })
-  }
-
-  loadMember (userId) {
+  // Load chat member
+  loadMember (userId: string): void {
       // Load challenger info
     const ref = firebase.database().ref(`users/${userId}`)
     return ref.once('value', (snapshot) => {
@@ -106,28 +90,88 @@ class ChallengeMessages extends Component {
     })
   }
 
-  loadMessages () {
-    firebase.database()
-    .ref(`messages/${this.props.challenge.id}`)
-    .limitToLast(30)
-    .on('value', (snapshot) => {
-      if (snapshot.val()) {
-        // console.log(snapshot.val())
-        this.setState({ messages: snapshot.val() })
-      }
+  // Load messages from firebase
+  loadMessages (): void {
+    if (this.props.challenge) {
+      const challengeId = this.props.challenge.id
+      firebase.database()
+      .ref(`messages/${challengeId}`)
+      .limitToLast(30)
+      .on('value', (snapshot) => {
+        if (snapshot.val()) {
+          // console.log(snapshot.val())
+          this.setState({ messages: snapshot.val() })
+        }
+      })
+    }
+  }
+
+  /******************/
+  /* Event handlers */
+  /******************/
+  // Handle when keyboard will show
+  onKeyboardWillShow (event: Object): void {
+    this.setState({ keyboardHeight: event.endCoordinates.height })
+    this.scrollView.scrollToEnd({ animated: true })
+  }
+
+  // Handle when keyboard will hide
+  onKeyboardWillHide (event: Object): void {
+    this.setState({ keyboardHeight: 0 })
+  }
+
+  // Handle navigator event (back button only)
+  onNavigatorEvent (event: Object): void {
+    if (event.id === 'back') {
+      this.onBackPress()
+    }
+  }
+
+  // Return to previous screen
+  onBackPress (): void {
+    this.props.navigator.dismissModal()
+  }
+
+  // Handle message input change
+  onMessageChange (val: string): void {
+    this.setState({ message: val })
+  }
+
+  // Send message
+  onSendMessagePress (): void {
+    if (!this.state.message || !this.state.profile || !this.props.challenge) {
+      return
+    }
+    const challengeId = this.props.challenge && this.props.challenge.id
+    const messageId = ObjectId().toString()
+    const ref = firebase.database().ref(`messages/${challengeId}/${messageId}`)
+    ref.set({
+      id: messageId,
+      text: this.state.message,
+      createdBy: this.state.profile && this.state.profile.id,
+      createdAt: Date.now()
+    })
+    .then(() => {
+      this.setState({ message: '' })
     })
   }
 
-  scrollToEnd () {
+  // Scoll to end of messages
+  scrollToEnd (): void {
     this.scrollView.scrollToEnd({animated: true})
   }
 
-  renderMessageForm () {
+  /******************/
+  /* Render helpers */
+  /******************/
+  // Render mesasge form
+  renderMessageForm (): View {
     return (
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <TextInput
           placeholder={I18n.t('enter_message')}
           style={styles.textInput}
+          underlineColorAndroid='transparent'
           value={this.state.message}
           onChangeText={this.onMessageChange.bind(this)} />
         <TouchableOpacity
@@ -144,11 +188,13 @@ class ChallengeMessages extends Component {
     )
   }
 
-  renderMessages () {
+  // Render message list
+  renderMessages (): ?ScrollView {
     if (!this.state.profile) {
       return null
     }
     let prevUserId
+    const messageRowStyle = StyleSheet.flatten(styles.messageRow)
     return (
       <ScrollView
         ref={(ref) => { this.scrollView = ref }}
@@ -156,7 +202,7 @@ class ChallengeMessages extends Component {
         onLayout={this.scrollToEnd.bind(this)}
         contentContainerStyle={{ paddingVertical: 8 }}>
         {map(this.state.messages, (msg) => {
-          const isMyMessage = this.state.profile.id === msg.createdBy
+          const isMyMessage = this.state.profile && (this.state.profile.id === msg.createdBy)
           let showPhoto = true
           if (prevUserId === msg.createdBy) {
             showPhoto = false
@@ -166,7 +212,7 @@ class ChallengeMessages extends Component {
             this.loadMember(msg.createdBy)
           }
           return (
-            <Row key={msg.id} style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+            <Row key={msg.id} style={messageRowStyle}>
               {isMyMessage ? (<Text />) : null}
               <View
                 style={{ alignSelf: isMyMessage ? 'flex-end' : 'flex-start', flexDirection: 'row', alignItems: 'center', marginHorizontal: 4 }}>
@@ -193,7 +239,7 @@ class ChallengeMessages extends Component {
     )
   }
 
-  render () {
+  render (): View {
     return (
       <View style={[ styles.container, { paddingBottom: this.state.keyboardHeight } ]}>
         {this.renderMessages()}
@@ -207,6 +253,10 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'flex-end',
     flex: 1
+  },
+  messageRow: {
+    justifyContent: 'space-between',
+    alignItems: 'center'
   },
   textInput: {
     flex: 1,

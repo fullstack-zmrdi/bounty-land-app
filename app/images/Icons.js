@@ -3,6 +3,7 @@ import { PixelRatio } from 'react-native'
 
 const navIconSize = (__DEV__ === false && Platform.OS === 'android') ? PixelRatio.getPixelSizeForLayoutSize(40) : 40; // eslint-disable-line
 const replaceSuffixPattern = /--(active|big|small|very-big)/g
+// Todo load only icons foractive platform
 const icons = {
   'ios-search': [30],
   'ios-arrow-round-down': [navIconSize],
@@ -12,7 +13,10 @@ const icons = {
   'ios-close': [40],
   'ios-share-outline': [30],
   'ios-undo': [30],
-  'ios-reverse-camera': [30]
+  'ios-reverse-camera': [30],
+  'md-share': [24],
+  'md-heart': [24],
+  'md-heart-outline': [24]
 }
 
 const iconsMap = {}

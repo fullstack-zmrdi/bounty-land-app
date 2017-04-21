@@ -5,6 +5,8 @@ import { InteractionManager, Platform, StatusBar, StyleSheet, View } from 'react
 import React, { Component } from 'react'
 
 import type { Challenge } from '../../typedef'
+import Cover from '../ChallengeDetail/Cover'
+// import I18n from 'react-native-i18n'
 import MapView from 'react-native-maps'
 import colors from 'material-colors'
 import map from 'lodash/map'
@@ -124,8 +126,47 @@ class Home extends Component<void, PropsType, StateType> {
 
   // Open challenge detail
   onChallengePress (challenge: Challenge): void {
+    const navigatorStyle: Object = {
+      navBarButtonColor: colors.white
+    }
+    let title = null
+    // let topTabs = null
+    if (Platform.OS === 'android') {
+      navigatorStyle.screenBackgroundColor = colors.white
+      navigatorStyle.collapsingToolBarComponent = 'COVER'
+      navigatorStyle.collapsingToolBarCollapsedColor = colors.cyan['500']
+      navigatorStyle.collapsingToolBarExpendedColor = 'transparent'
+      navigatorStyle.topBarElevationShadowEnabled = false
+      navigatorStyle.showTitleWhenExpended = false
+      navigatorStyle.showSubtitleWhenExpended = false
+      navigatorStyle.navBarTextColor = colors.white
+      title = challenge.name
+      /*
+      navigatorStyle.navBarHideOnScroll = false
+      navigatorStyle.topBarCollapseOnScroll = true
+      navigatorStyle.expendCollapsingToolBarOnTopTabChange = false
+      navigatorStyle.collapsingToolBarComponentHeight = 360
+      topTabs = [{
+        screenId: 'CHALLENGE_DETAIL',
+        title: I18n.t('detail'),
+        passProps: { challenge }
+      }, {
+        screenId: 'CHALLENGE_MESSAGES',
+        title: I18n.t('messages'),
+        passProps: { challenge }
+      }]
+      */
+    } else {
+      navigatorStyle.navBarTranslucent = true
+      navigatorStyle.drawUnderNavBar = true
+    }
+
+    Cover.setProps(challenge)
     this.props.navigator.showModal({
       screen: 'CHALLENGE_DETAIL',
+      navigatorStyle,
+      title,
+      // topTabs,
       passProps: { challenge }
     })
   }
