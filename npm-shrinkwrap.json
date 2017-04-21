@@ -3485,9 +3485,9 @@
       "resolved": "https://registry.npmjs.org/react-native-maps/-/react-native-maps-0.13.1.tgz"
     },
     "react-native-navigation": {
-      "version": "2.0.0-experimental.256",
-      "from": "react-native-navigation@2.0.0-experimental.256",
-      "resolved": "https://registry.npmjs.org/react-native-navigation/-/react-native-navigation-2.0.0-experimental.256.tgz"
+      "version": "2.0.0-experimental.304",
+      "from": "react-native-navigation@2.0.0-experimental.304",
+      "resolved": "https://registry.npmjs.org/react-native-navigation/-/react-native-navigation-2.0.0-experimental.304.tgz"
     },
     "react-native-scrollable-tab-view": {
       "version": "0.7.4",
