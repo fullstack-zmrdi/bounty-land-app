@@ -2,17 +2,17 @@
 
 import * as firebase from 'firebase'
 
+import { Platform, UIManager } from 'react-native'
+
 import Auth from './auth'
+import type { AuthData } from './typedef'
 import I18n from 'react-native-i18n'
 import { Navigation } from 'react-native-navigation'
-import { Platform } from 'react-native'
 import czechTranslations from './locales/cs'
 import englishTranslations from './locales/en'
 import { firebaseConfig } from './config'
-import { registerScreens } from './scenes'
 import { iconsLoaded } from './images/Icons'
-
-import type { AuthData } from './typedef'
+import { registerScreens } from './scenes'
 
 const DEFAULT_LOCALE = I18n.locale.split('-')[0]
 const handleMissing = (scope) => `${scope || 'unknown'}`
@@ -28,7 +28,9 @@ class App {
   constructor () {
     // console.log('app constructor')
     this.authData = {}
-
+    if (Platform.OS === 'android') {
+      UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true)
+    }
     Promise.all([
       Auth.getAuthData(),
       iconsLoaded
