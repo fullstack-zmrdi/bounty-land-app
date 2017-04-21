@@ -7,6 +7,7 @@ import android.content.Intent;
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
 
 import com.airbnb.android.react.maps.MapsPackage;
+import com.BV.LinearGradient.LinearGradientPackage;
 import com.jajija.bountyland.BuildConfig;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.CallbackManager;
@@ -61,13 +62,15 @@ public class MainApplication extends NavigationApplication {
     @Override
     public List<ReactPackage> createAdditionalReactPackages() {
         return Arrays.<ReactPackage>asList(
-            new VectorIconsPackage(),
-            new RCTToastPackage(),
-            new RNGoogleSigninPackage(),
-            new FBSDKPackage(mCallbackManager),
-            new MapsPackage(),
-            new RNFSPackage(),
-            new RNFetchBlobPackage()
+                new FBSDKPackage(mCallbackManager),
+                new LinearGradientPackage(),
+                new MapsPackage(),
+                new RNFSPackage(),
+                new RNFetchBlobPackage(),
+                new RNGoogleSigninPackage(),
+                new RCTCameraPackage(),
+                new RCTToastPackage(),
+                new VectorIconsPackage()
         );
     }
 }
