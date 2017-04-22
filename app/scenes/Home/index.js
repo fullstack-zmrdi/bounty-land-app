@@ -1,10 +1,10 @@
 /* @flow */
 import * as firebase from 'firebase'
 
-import { Platform, StatusBar, StyleSheet, View, Text, /* LayoutAnimation, */ ActivityIndicator } from 'react-native'
+import { Platform, StatusBar, StyleSheet, Image, View, Text, /* LayoutAnimation, */ ActivityIndicator, Animated } from 'react-native'
 import React, { Component } from 'react'
 import LinearGradient from 'react-native-linear-gradient'
-
+import { DeckSwiper, Card, CardItem, Left, Thumbnail, Body, H1, H3 } from 'native-base'
 import type { Challenge } from '../../typedef'
 import { themeColors, categoryColors } from '../../theme'
 import Cover from '../ChallengeDetail/Cover'
@@ -19,6 +19,8 @@ import I18n from 'react-native-i18n'
 import MarkerView from './Marker'
 import {iconsMap} from '../../images/Icons'
 import Geofire from 'geofire'
+import Swiper from 'react-native-swiper'
+import Icon from 'react-native-vector-icons/Ionicons'
 
 type PropsType = {
   navigator: Object
@@ -41,7 +43,6 @@ class Home extends Component<void, PropsType, StateType> {
         navBarTransparent: true
       },
       android: {
-        navBarTranslucent: true,
         navBarTransparent: true,
         drawUnderNavBar: true,
         topBarElevationShadowEnabled: false,
@@ -64,11 +65,12 @@ class Home extends Component<void, PropsType, StateType> {
       android: {}
     })
   }
-
+  currentIndex  = 0
   state = {
     selectedChallenge: null,
     userLatLng: null,
     challenges: {},
+    swiperPosition: new Animated.Value(-220),
     region: new MapView.AnimatedRegion({
       latitude: 37.78825,
       longitude: -122.4324,
@@ -169,13 +171,23 @@ class Home extends Component<void, PropsType, StateType> {
         passProps: { challenge }
       })
     } else {
-      this.state.region.setValue({
-        ...challenge.location,
-        latitudeDelta: 0.015,
-        longitudeDelta: 0.0121
-      })
+      let scrollBy = 0
+      const index = Object.keys(this.state.challenges).indexOf(challenge.id)
+      scrollBy = index - this.swiper.state.index
+      this.swiper.scrollBy(scrollBy)
+      this.toggleSwiper(true)
       this.setState({ selectedChallenge: challenge })
     }
+  }
+
+  _onMomentumScrollEnd(e, state, context) {
+    const challengeId = Object.keys(this.state.challenges)[state.index]
+    this.setState({ selectedChallenge: this.state.challenges[challengeId]})
+    this.state.region.setValue({
+      ...this.state.challenges[challengeId].location,
+      latitudeDelta: 0.015,
+      longitudeDelta: 0.0121
+    })
   }
 
   // Get user current position and et to state
@@ -288,6 +300,26 @@ class Home extends Component<void, PropsType, StateType> {
     })
   }
 
+  toggleSwiper (visible: bool): void {
+    if (visible) {
+        Animated.timing(                            // Animate value over time
+        this.state.swiperPosition,                      // The value to drive
+        {
+          toValue: 0,
+          duration: 500                        // Animate to final value of 1
+        }
+      ).start();
+    } else {
+      Animated.timing(                            // Animate value over time
+        this.state.swiperPosition,                      // The value to drive
+        {
+          toValue: -220,
+          duration: 500                            // Animate to final value of 1
+        }
+      ).start();
+    }
+  }
+
   render () {
     if (!this.state.userLatLng) {
       return (
@@ -304,6 +336,7 @@ class Home extends Component<void, PropsType, StateType> {
     return (
       <View style={styles.container}>
         <MapView.Animated
+          onPress={() => this.toggleSwiper(false)}
           style={styles.map}
           region={this.state.region}>
           {map(this.state.challenges, (challenge) => {
@@ -337,7 +370,50 @@ class Home extends Component<void, PropsType, StateType> {
               }} />
           ) : null}
         </MapView.Animated>
-
+        <Animated.View style={{ position: 'absolute', paddingVertical: 16, bottom: this.state.swiperPosition, height: 240, left: 0, right: 0 }}>
+          <Swiper
+            onMomentumScrollEnd={this._onMomentumScrollEnd.bind(this)}
+            ref={(ref) => {this.swiper = ref}}
+            loop >
+            {map(this.state.challenges, (item) => {
+              const challengeLatLng = [item.location.latitude, item.location.longitude]
+              const userLatLng = [this.state.userLatLng.latitude, this.state.userLatLng.longitude]
+              const distance = Geofire.distance(userLatLng, challengeLatLng)
+              return (
+                <View style={{ flex: 1, paddingHorizontal: 8, flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <View style={{ flex: 1, backgroundColor: colors.white, elevation: 3, borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
+                    <Image source={{ uri: item.photo}} style={{ height: 240, position: 'absolute', left: 0, right: 0,  resizeMode: 'cover'}}/>
+                    <LinearGradient colors={[themeColors.primaryColorDark,'rgba(255,255,255,0)']} style={{ height: 240, paddingVertical: 8, borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
+                      <View style={{ paddingBottom: 8, paddingHorizontal: 16, backgroundColor: themeColors.primaryColorDark, flexDirection: 'row', marginBottom: 16, justifyContent: 'space-between', alignItems: 'center' }}>
+                        <View>
+                          <H3 style={{ color: colors.lightText.primary, fontWeight: 'bold' }}>{item.name}</H3>
+                          <Text style={{ color: colors.lightText.secondary}}>{I18n.t(item.category)}</Text>
+                        </View>
+                        <Text style={{ fontSize: 24, color: colors.white, justifyContent: 'center'}}>
+                          <Icon size={24} name="md-navigate" color={colors.white} />
+                          {' '}{distance.toFixed(1)}km
+                        </Text>
+                      </View>
+                      <View style={{ marginBottom: 16, paddingHorizontal: 16,  }}>
+                        <Text style={{ fontSize: 16, color: colors.lightText.primary}}>
+                          <Text style={{ fontWeight: 'bold'}}>{(item.participants && item.participants.length) || 0}</Text>
+                          {' '}
+                          {I18n.t('n_participants', { count: (item.participants && item.participants.length) || 0}) }
+                        </Text>
+                        <Text style={{ fontSize: 16, color: colors.lightText.primary}}>
+                          <Text style={{ fontWeight: 'bold'}}>{item.bounty}$</Text>
+                          {' '}
+                          {I18n.t('total_bounty') }
+                        </Text>
+                      </View>
+                      <Text style={{ paddingHorizontal: 16, color: colors.lightText.secondary}}>{item.description}</Text>
+                    </LinearGradient>
+                  </View>
+                </View>
+              )
+            })}
+          </Swiper>
+        </Animated.View>
       </View>
     )
   }

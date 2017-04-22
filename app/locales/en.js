@@ -28,5 +28,9 @@ export default {
   cancel: 'Cancel',
   raise_bounty: 'Raise Bounty',
   map_loading: 'Map is loading please wait...',
-  get_position_error: 'Can\'t get your current position'
+  get_position_error: 'Can\'t get your current position',
+  n_participants: {
+    one: 'Participant',
+    other: 'Participants'
+  }
 }

@@ -3499,6 +3499,11 @@
       "from": "react-native-scrollable-tab-view@>=0.7.1 <0.8.0",
       "resolved": "https://registry.npmjs.org/react-native-scrollable-tab-view/-/react-native-scrollable-tab-view-0.7.4.tgz"
     },
+    "react-native-swiper": {
+      "version": "1.5.4",
+      "from": "react-native-swiper@latest",
+      "resolved": "https://registry.npmjs.org/react-native-swiper/-/react-native-swiper-1.5.4.tgz"
+    },
     "react-native-vector-icons": {
       "version": "4.0.1",
       "from": "react-native-vector-icons@>=4.0.0 <5.0.0",
