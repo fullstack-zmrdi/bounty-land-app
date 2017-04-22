@@ -1,0 +1,2 @@
+com/jajija/bountyland/MainApplication.class
+com/jajija/bountyland/MainActivity.class

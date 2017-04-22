@@ -2,7 +2,6 @@ package com.jajija.bountyland;
 
 import android.content.Context;
 import android.content.Intent;
-// import android.support.multidex.MultiDex;
 
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
 
@@ -34,12 +33,6 @@ public class MainApplication extends NavigationApplication {
     }
 
     @Override
-    protected void attachBaseContext(Context context) {
-        super.attachBaseContext(context);
-       //  MultiDex.install(this);
-    }
-
-    @Override
     public void onCreate() {
         super.onCreate();
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -52,7 +45,6 @@ public class MainApplication extends NavigationApplication {
             }
         });
     }
-
 
     @Override
     public boolean isDebug() {
