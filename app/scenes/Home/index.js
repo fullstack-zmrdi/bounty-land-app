@@ -1,10 +1,12 @@
 /* @flow */
 import * as firebase from 'firebase'
 
-import { InteractionManager, Platform, StatusBar, StyleSheet, View, Image, Text, LayoutAnimation } from 'react-native'
+import { Platform, StatusBar, StyleSheet, View, Text, /* LayoutAnimation, */ ActivityIndicator } from 'react-native'
 import React, { Component } from 'react'
+import LinearGradient from 'react-native-linear-gradient'
 
 import type { Challenge } from '../../typedef'
+import { themeColors, categoryColors } from '../../theme'
 import Cover from '../ChallengeDetail/Cover'
 // import I18n from 'react-native-i18n'
 import MapView from 'react-native-maps'
@@ -15,25 +17,17 @@ import searchIcon from '../../images/ic_search_black_24dp.png'
 import Toast from '@remobile/react-native-toast'
 import I18n from 'react-native-i18n'
 import MarkerView from './Marker'
-const icons = {
-  garbage: require('../../images/icon_garbage.png'),
-  fun: require('../../images/icon_fun.png'),
-  deeds: require('../../images/icon_good_deed.png')
-
-}
-const categoryColors = {
-  garbage: 'rgba(129,199,132,.25)',
-  fun: 'rgba(255,224,130,.25)',
-  deeds: 'rgba(240,98,146,.25)'
-}
+import {iconsMap} from '../../images/Icons'
 
 type PropsType = {
   navigator: Object
 }
 
 type StateType = {
-  challenges: Array<Challenge>,
-  region: Object
+  challenges: { [key: string]: Challenge},
+  region: Object,
+  userLatLng: ?{ latitude: number, longitude: number },
+  selectedChallenge: ?Challenge
 }
 
 class Home extends Component<void, PropsType, StateType> {
@@ -47,10 +41,9 @@ class Home extends Component<void, PropsType, StateType> {
       android: {
         navBarTranslucent: true,
         navBarTransparent: true,
-        navBarButtonColor: 'red',
         drawUnderNavBar: true,
         topBarElevationShadowEnabled: false,
-        selectedChallenge: {}
+        navBarButtonColor: colors.black
       }
     })
   }
@@ -66,34 +59,14 @@ class Home extends Component<void, PropsType, StateType> {
           label: 'test'
         }]
       },
-      android: {
-        fab: {
-          collapsedId: 'add_challenge',
-          collapsedIcon: plusIcon,
-          backgroundColor: colors.red['500']
-        },
-        leftButtons: [{
-          id: 'sideMenu'
-        }],
-        rightButtons: [{
-          id: 'searchView',
-          icon: searchIcon,
-          hint: 'search_challenges'
-        }]
-      }
+      android: {}
     })
   }
 
   state = {
-    position: {},
-    selectLocation: false,
-    challengeData: {},
-    selectedLocation: {
-      latitude: 37.78825,
-      longitude: -122.4324
-    },
-    selectedLocationRadius: 50,
-    challenges: [],
+    selectedChallenge: null,
+    userLatLng: null,
+    challenges: {},
     region: new MapView.AnimatedRegion({
       latitude: 37.78825,
       longitude: -122.4324,
@@ -102,19 +75,14 @@ class Home extends Component<void, PropsType, StateType> {
     })
   }
 
-  componentDidMount () {
-    StatusBar.setBarStyle('dark-content', true)
+  componentDidMount (): void {
+    this.loadChallenges()
+    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this))
+    this.getCurrentPosition()
+  }
 
-    InteractionManager.runAfterInteractions(() => {
-      this.loadChallenges()
-      this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this))
-      /*
-       navigator.geolocation.getCurrentPosition((pos) => {
-       console.log(pos)
-       this.setState({ position: pos })
-       }, error => console.error(error), { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 })
-       */
-    })
+  componentWillUpdate (): void {
+    // LayoutAnimation.easeInEaseOut()
   }
 
   // Handle navigator event
@@ -124,7 +92,24 @@ class Home extends Component<void, PropsType, StateType> {
       if (event.id === 'add_challenge') {
         this.onAddChallengePress()
       }
+      if (event.id === 'locate_me') {
+        this.onLocateMePress()
+      }
     }
+  }
+
+  // Center map to user position
+  onLocateMePress (): void {
+    if (!this.state.userLatLng) {
+      return
+    }
+    this.setState({
+      region: new MapView.AnimatedRegion({
+        ...this.state.userLatLng,
+        latitudeDelta: 0.015,
+        longitudeDelta: 0.0121
+      })
+    })
   }
 
   // Open camera to take picture for new challenge
@@ -168,26 +153,79 @@ class Home extends Component<void, PropsType, StateType> {
       navigatorStyle.navBarTranslucent = true
       navigatorStyle.drawUnderNavBar = true
     }
-    if (true) {
+
+    if (this.state.selectedChallenge && this.state.selectedChallenge.id === challenge.id) {
+      Cover.setProps(challenge)
+      this.props.navigator.showModal({
+        screen: 'CHALLENGE_DETAIL',
+        navigatorStyle,
+        title,
+        // topTabs,
+        passProps: { challenge }
+      })
+    } else {
       this.state.region.setValue({
         ...challenge.location,
         latitudeDelta: 0.015,
         longitudeDelta: 0.0121
       })
-      this.setState({
-        selectedChallenge: challenge,
-      })
-      return
+      this.setState({ selectedChallenge: challenge })
     }
+  }
 
-    Cover.setProps(challenge)
-    this.props.navigator.showModal({
-      screen: 'CHALLENGE_DETAIL',
-      navigatorStyle,
-      title,
-      // topTabs,
-      passProps: { challenge }
+  // Get user current position and et to state
+  getCurrentPosition (): void {
+    navigator.geolocation
+    .getCurrentPosition((data) => {
+      // console.log('geolocation position', data.coords)
+      const latlng = {
+        latitude: data.coords.latitude,
+        longitude: data.coords.longitude
+      }
+      this.setButtons()
+      this.setState({
+        userLatLng: latlng,
+        region: new MapView.AnimatedRegion({
+          ...latlng,
+          latitudeDelta: 0.015,
+          longitudeDelta: 0.0121
+        })
+      })
+    }, (error) => {
+      console.error(error)
+      Toast.showLongBottom(I18n.t('get_position_error'))
+    }, {
+      enableHighAccuracy: false,
+      timeout: 20000,
+      maximumAge: 1000
     })
+  }
+
+  // Set navigator buttons and status bar style
+  setButtons () {
+    StatusBar.setBarStyle('dark-content', true)
+    if (Platform.OS === 'android') {
+      this.props.navigator.setButtons({
+        leftButtons: [{
+          id: 'sideMenu',
+          icon: iconsMap['md-menu'],
+          buttonColor: '#000'
+        }],
+        rightButtons: [{
+          id: 'locate_me',
+          icon: iconsMap['md-locate']
+        }, {
+          id: 'searchView',
+          icon: searchIcon,
+          hint: 'search_challenges'
+        }],
+        fab: {
+          collapsedId: 'add_challenge',
+          collapsedIcon: plusIcon,
+          backgroundColor: themeColors.primaryColor
+        }
+      })
+    }
   }
 
   loadChallenges () {
@@ -206,6 +244,18 @@ class Home extends Component<void, PropsType, StateType> {
   }
 
   render () {
+    if (!this.state.userLatLng) {
+      return (
+        <LinearGradient
+          colors={[themeColors.primaryColor, themeColors.accentColor]}
+          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <ActivityIndicator color={colors.white} size={60} />
+          <Text style={{ color: colors.white, paddingTop: 30 }}>
+            {I18n.t('map_loading')}
+          </Text>
+        </LinearGradient>
+      )
+    }
     return (
       <View style={styles.container}>
         <MapView.Animated
@@ -217,21 +267,31 @@ class Home extends Component<void, PropsType, StateType> {
                 key={challenge.id}
                 onPress={this.onChallengePress.bind(this, challenge)}
                 coordinate={{ latitude: challenge.location.latitude, longitude: challenge.location.longitude }}>
-                    <MarkerView
-                      challenge={challenge}
-                      selectedChallengeId={this.state.selectedChallenge && this.state.selectedChallenge.id} />
+                <MarkerView
+                  challenge={challenge}
+                  selectedChallengeId={this.state.selectedChallenge && this.state.selectedChallenge.id} />
               </MapView.Marker>
             ))
           }
           {this.state.selectedChallenge
           ? (
             <MapView.Circle
-                center={this.state.selectedChallenge.location}
-                radius={this.state.selectedChallenge.location.radiusInMeters}
-                fillColor={categoryColors[this.state.selectedChallenge.category]}
-                strokeWidth={0} />
+              center={this.state.selectedChallenge.location}
+              radius={this.state.selectedChallenge.location.radiusInMeters}
+              fillColor={categoryColors[this.state.selectedChallenge.category]}
+              strokeWidth={0} />
+          ) : null}
+          {this.state.userLatLng
+          ? (
+            <MapView.Marker
+              image={iconsMap['md-locate']}
+              coordinate={{
+                latitude: this.state.userLatLng.latitude,
+                longitude: this.state.userLatLng.longitude
+              }} />
           ) : null}
         </MapView.Animated>
+
       </View>
     )
   }

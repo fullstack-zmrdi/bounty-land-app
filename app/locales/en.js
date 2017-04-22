@@ -26,5 +26,7 @@ export default {
   name: 'Name',
   description: 'Description',
   cancel: 'Cancel',
-  raise_bounty: 'Raise Bounty'
+  raise_bounty: 'Raise Bounty',
+  map_loading: 'Map is loading please wait...',
+  get_position_error: 'Can\'t get your current position'
 }

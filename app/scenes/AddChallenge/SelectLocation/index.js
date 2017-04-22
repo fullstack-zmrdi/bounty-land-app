@@ -73,6 +73,16 @@ class SelectLocationScreen extends Component<void, PropsType, StateType> {
     }
   }
 
+  componentDidMount (): void {
+    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this))
+  }
+
+  onNavigatorEvent (event: Object): void {
+    if (event.id === 'save_challenge') {
+      this.onConfirmPress()
+    }
+  }
+
   // Update map and set selected location
   onMapPress ({ coordinate }: { coordinate: Object }): void {
     // console.log('map press', coordinate)

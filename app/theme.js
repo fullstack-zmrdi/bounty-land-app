@@ -23,3 +23,20 @@ export const navigatorStyle = {
   screenBackgroundColor: 'white', // Default screen color, visible before the actual react view is rendered
   orientation: 'portrait' // Sets a specific orientation to a modal and all screens pushed to it. Default: 'auto'. Supported values: 'auto',
 }
+
+export const themeColors = {
+  primaryColor: '#00bcd4',
+  primaryColorDark: '#0097a7',
+  accentColor: '#b09b2c'
+}
+
+export const categoryIcons = {
+  garbage: require('./images/icon_garbage.png'),
+  fun: require('./images/icon_fun.png'),
+  deeds: require('./images/icon_good_deed.png')
+}
+export const categoryColors = {
+  garbage: 'rgba(129,199,132,.25)',
+  fun: 'rgba(255,224,130,.25)',
+  deeds: 'rgba(240,98,146,.25)'
+}

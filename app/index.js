@@ -135,8 +135,7 @@ class App {
   startAppAsAuthenticatedUserAndroid (authData: Object) {
     Navigation.startSingleScreenApp({
       screen: {
-        screen: 'HOME',
-        title: I18n.t('challenge_map')
+        screen: 'HOME'
       },
       drawer: {
         left: {

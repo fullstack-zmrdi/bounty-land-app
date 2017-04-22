@@ -25,6 +25,8 @@ export type AuthData = {
 }
 
 export type Challenge = {
+  id: string,
+  category: string,
   createdBy: string,
   name: string,
   location: {

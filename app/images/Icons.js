@@ -1,6 +1,6 @@
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { PixelRatio } from 'react-native'
-
+import { themeColors } from '../theme'
 const navIconSize = (__DEV__ === false && Platform.OS === 'android') ? PixelRatio.getPixelSizeForLayoutSize(40) : 40; // eslint-disable-line
 const replaceSuffixPattern = /--(active|big|small|very-big)/g
 // Todo load only icons foractive platform
@@ -16,7 +16,9 @@ const icons = {
   'ios-reverse-camera': [30],
   'md-share': [24],
   'md-heart': [24],
-  'md-heart-outline': [24]
+  'md-heart-outline': [24],
+  'md-menu': [24],
+  'md-locate': [24, themeColors.primaryColorDark]
 }
 
 const iconsMap = {}
