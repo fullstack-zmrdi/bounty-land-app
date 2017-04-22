@@ -1,7 +1,7 @@
 /* @flow */
 import * as firebase from 'firebase'
 
-import { InteractionManager, Platform, StatusBar, StyleSheet, View } from 'react-native'
+import { InteractionManager, Platform, StatusBar, StyleSheet, View, Image, Text, LayoutAnimation } from 'react-native'
 import React, { Component } from 'react'
 
 import type { Challenge } from '../../typedef'
@@ -12,6 +12,20 @@ import colors from 'material-colors'
 import map from 'lodash/map'
 import plusIcon from '../../images/ic_add_white_24dp.png'
 import searchIcon from '../../images/ic_search_black_24dp.png'
+import Toast from '@remobile/react-native-toast'
+import I18n from 'react-native-i18n'
+import MarkerView from './Marker'
+const icons = {
+  garbage: require('../../images/icon_garbage.png'),
+  fun: require('../../images/icon_fun.png'),
+  deeds: require('../../images/icon_good_deed.png')
+
+}
+const categoryColors = {
+  garbage: 'rgba(129,199,132,.25)',
+  fun: 'rgba(255,224,130,.25)',
+  deeds: 'rgba(240,98,146,.25)'
+}
 
 type PropsType = {
   navigator: Object
@@ -35,7 +49,8 @@ class Home extends Component<void, PropsType, StateType> {
         navBarTransparent: true,
         navBarButtonColor: 'red',
         drawUnderNavBar: true,
-        topBarElevationShadowEnabled: false
+        topBarElevationShadowEnabled: false,
+        selectedChallenge: {}
       }
     })
   }
@@ -79,21 +94,19 @@ class Home extends Component<void, PropsType, StateType> {
     },
     selectedLocationRadius: 50,
     challenges: [],
-    region: {
+    region: new MapView.AnimatedRegion({
       latitude: 37.78825,
       longitude: -122.4324,
       latitudeDelta: 0.015,
       longitudeDelta: 0.0121
-    }
+    })
   }
 
   componentDidMount () {
     StatusBar.setBarStyle('dark-content', true)
 
     InteractionManager.runAfterInteractions(() => {
-      firebase.database().ref('/challenges').on('value', (snapshot) => {
-        this.setState({ challenges: snapshot.val() })
-      })
+      this.loadChallenges()
       this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this))
       /*
        navigator.geolocation.getCurrentPosition((pos) => {
@@ -117,11 +130,6 @@ class Home extends Component<void, PropsType, StateType> {
   // Open camera to take picture for new challenge
   onAddChallengePress (): void {
     this.props.navigator.showModal({ screen: 'TAKE_PICTURE' })
-  }
-
-  // Update region on user geolocation change
-  updateRegion (newRegion: Object): void {
-    this.setState({ region: { ...this.state.region, ...newRegion } })
   }
 
   // Open challenge detail
@@ -160,6 +168,17 @@ class Home extends Component<void, PropsType, StateType> {
       navigatorStyle.navBarTranslucent = true
       navigatorStyle.drawUnderNavBar = true
     }
+    if (true) {
+      this.state.region.setValue({
+        ...challenge.location,
+        latitudeDelta: 0.015,
+        longitudeDelta: 0.0121
+      })
+      this.setState({
+        selectedChallenge: challenge,
+      })
+      return
+    }
 
     Cover.setProps(challenge)
     this.props.navigator.showModal({
@@ -171,10 +190,25 @@ class Home extends Component<void, PropsType, StateType> {
     })
   }
 
+  loadChallenges () {
+    firebase
+    .database()
+    .ref('/challenges')
+    .on('value', (snapshot) => {
+      Toast.showLongBottom(I18n.t('challenges_updated'))
+      this.setState({ challenges: snapshot.val() })
+    })
+  }
+
+  // Update region on user geolocation change
+  updateRegion (newRegion: Object): void {
+    this.setState({ region: { ...this.state.region, ...newRegion } })
+  }
+
   render () {
     return (
       <View style={styles.container}>
-        <MapView
+        <MapView.Animated
           style={styles.map}
           region={this.state.region}>
           {
@@ -182,12 +216,22 @@ class Home extends Component<void, PropsType, StateType> {
               <MapView.Marker
                 key={challenge.id}
                 onPress={this.onChallengePress.bind(this, challenge)}
-                coordinate={{ latitude: challenge.location.latitude, longitude: challenge.location.longitude }}
-                title={challenge.name}
-                description={challenge.description} />
+                coordinate={{ latitude: challenge.location.latitude, longitude: challenge.location.longitude }}>
+                    <MarkerView
+                      challenge={challenge}
+                      selectedChallengeId={this.state.selectedChallenge && this.state.selectedChallenge.id} />
+              </MapView.Marker>
             ))
           }
-        </MapView>
+          {this.state.selectedChallenge
+          ? (
+            <MapView.Circle
+                center={this.state.selectedChallenge.location}
+                radius={this.state.selectedChallenge.location.radiusInMeters}
+                fillColor={categoryColors[this.state.selectedChallenge.category]}
+                strokeWidth={0} />
+          ) : null}
+        </MapView.Animated>
       </View>
     )
   }
