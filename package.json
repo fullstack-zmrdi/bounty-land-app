@@ -13,7 +13,8 @@
     "bundle:all": "npm run bundle:android && npm run bundle:ios",
     "release:ios": "./scripts/build-ios.sh BountyLandRelease iphoneos -- archive",
     "release:android": "cd android && ./gradlew assembleRelease && cd ../",
-    "release:travis": "./scripts/travis-release.sh"
+    "release:travis": "./scripts/travis-release.sh",
+    "android": "cd android && ./gradlew installDebug -q && cd ../"
   },
   "dependencies": {
     "@remobile/react-native-toast": "^1.0.6",
