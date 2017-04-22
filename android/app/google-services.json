@@ -36,6 +36,37 @@
           "status": 2
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:21402723903:android:fdff6a3b0af80a8c",
+        "android_client_info": {
+          "package_name": "com.jajija.bountyland.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "21402723903-o24men6s8ea2tepusapi4tm3riq3nhn6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjCv1bA4habanhX2BwY_ZsnBC_G3oJ6uc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
     }
   ],
   "configuration_version": "1"

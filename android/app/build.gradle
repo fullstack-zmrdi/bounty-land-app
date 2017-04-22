@@ -113,10 +113,12 @@ android {
     }
     buildTypes {
         release {
+            multiDexKeepFile new File('multidex-keep.txt')
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
         debug {
+            applicationIdSuffix '.debug'
             multiDexKeepFile new File('multidex-keep.txt')
         }
     }
