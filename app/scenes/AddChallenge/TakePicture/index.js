@@ -25,7 +25,8 @@ class TakePicture extends Component<void, PropsType, StateType> {
     drawUnderNavBar: true,
     navBarTranslucent: true,
     navBarTransparent: true,
-    navBarButtonColor: colors.white
+    navBarButtonColor: colors.white,
+    screenBackgroundColor: colors.black
   }
 
   state = {
@@ -227,7 +228,8 @@ class TakePicture extends Component<void, PropsType, StateType> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    backgroundColor: 'black'
   },
   cameraControlsRow: {
     flexDirection: 'row',

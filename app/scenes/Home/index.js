@@ -13,11 +13,12 @@ import MapView from 'react-native-maps'
 import colors from 'material-colors'
 import map from 'lodash/map'
 import plusIcon from '../../images/ic_add_white_24dp.png'
-import searchIcon from '../../images/ic_search_black_24dp.png'
+// import searchIcon from '../../images/ic_search_black_24dp.png'
 import Toast from '@remobile/react-native-toast'
 import I18n from 'react-native-i18n'
 import MarkerView from './Marker'
 import {iconsMap} from '../../images/Icons'
+import Geofire from 'geofire'
 
 type PropsType = {
   navigator: Object
@@ -31,6 +32,7 @@ type StateType = {
 }
 
 class Home extends Component<void, PropsType, StateType> {
+  geofire: Geofire;
   static navigatorStyle = {
     ...Platform.select({
       ios: {
@@ -76,9 +78,11 @@ class Home extends Component<void, PropsType, StateType> {
   }
 
   componentDidMount (): void {
-    this.loadChallenges()
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this))
     this.getCurrentPosition()
+    .then((coords) => {
+      this.loadChallenges(coords)
+    })
   }
 
   componentWillUpdate (): void {
@@ -100,6 +104,7 @@ class Home extends Component<void, PropsType, StateType> {
 
   // Center map to user position
   onLocateMePress (): void {
+    // this.setGeofire()
     if (!this.state.userLatLng) {
       return
     }
@@ -174,30 +179,34 @@ class Home extends Component<void, PropsType, StateType> {
   }
 
   // Get user current position and et to state
-  getCurrentPosition (): void {
-    navigator.geolocation
-    .getCurrentPosition((data) => {
-      // console.log('geolocation position', data.coords)
-      const latlng = {
-        latitude: data.coords.latitude,
-        longitude: data.coords.longitude
-      }
-      this.setButtons()
-      this.setState({
-        userLatLng: latlng,
-        region: new MapView.AnimatedRegion({
-          ...latlng,
-          latitudeDelta: 0.015,
-          longitudeDelta: 0.0121
+  getCurrentPosition (): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation
+        .getCurrentPosition((data) => {
+          // console.log('geolocation position', data.coords)
+          const latlng = {
+            latitude: data.coords.latitude,
+            longitude: data.coords.longitude
+          }
+          this.setButtons()
+          this.setState({
+            userLatLng: latlng,
+            region: new MapView.AnimatedRegion({
+              ...latlng,
+              latitudeDelta: 0.015,
+              longitudeDelta: 0.0121
+            })
+          })
+          return resolve(data.coords)
+        }, (error) => {
+          console.error(error)
+          Toast.showLongBottom(I18n.t('get_position_error'))
+          return reject(error)
+        }, {
+          enableHighAccuracy: false,
+          timeout: 20000,
+          maximumAge: 1000
         })
-      })
-    }, (error) => {
-      console.error(error)
-      Toast.showLongBottom(I18n.t('get_position_error'))
-    }, {
-      enableHighAccuracy: false,
-      timeout: 20000,
-      maximumAge: 1000
     })
   }
 
@@ -214,11 +223,11 @@ class Home extends Component<void, PropsType, StateType> {
         rightButtons: [{
           id: 'locate_me',
           icon: iconsMap['md-locate']
-        }, {
+        }/* , {
           id: 'searchView',
           icon: searchIcon,
           hint: 'search_challenges'
-        }],
+        } */],
         fab: {
           collapsedId: 'add_challenge',
           collapsedIcon: plusIcon,
@@ -228,19 +237,55 @@ class Home extends Component<void, PropsType, StateType> {
     }
   }
 
-  loadChallenges () {
-    firebase
-    .database()
-    .ref('/challenges')
-    .on('value', (snapshot) => {
-      Toast.showLongBottom(I18n.t('challenges_updated'))
-      this.setState({ challenges: snapshot.val() })
+  loadChallengeById (id: string): void {
+    console.log('load challenge', id)
+    const firebaseRef = firebase.database().ref(`challenges/${id}`)
+    firebaseRef.once('value', (snapshot) => {
+      // console.log('loaded challenge', snapshot.val())
+      this.setState({
+        challenges: {
+          ...this.state.challenges,
+          [id]: snapshot.val()
+        }
+      })
+    })
+  }
+
+  loadChallenges (coords: Object): void {
+    const geoRef = firebase.database().ref()
+    this.geofire = new Geofire(geoRef)
+    // console.log('load challenges', [coords.latitude, coords.longitude])
+    const geoQuery = this.geofire.query({
+      center: [coords.latitude, coords.longitude],
+      radius: 0.5
+    })
+    geoQuery.on('key_entered', (key, location, distance) => {
+      this.loadChallengeById(key)
+      console.log('gf key entered', key, location, distance)
+    })
+
+    geoQuery.on('ready', (res) => {
+      console.log('gf query ready', res)
+    })
+
+    geoQuery.on('key_exited', (key, location, distance) => {
+      console.log('gf key exited', key, location, distance)
     })
   }
 
   // Update region on user geolocation change
   updateRegion (newRegion: Object): void {
     this.setState({ region: { ...this.state.region, ...newRegion } })
+  }
+
+  setGeofire () {
+    const ref = firebase.database().ref('challenges')
+    ref.on('value', (snapshot) => {
+      map(snapshot.val(), (item) => {
+        console.log('geofire set item', item.id, [item.location.latitude, item.location.longitude])
+        this.geofire.set(item.id, [item.location.latitude, item.location.longitude])
+      })
+    })
   }
 
   render () {
@@ -261,8 +306,9 @@ class Home extends Component<void, PropsType, StateType> {
         <MapView.Animated
           style={styles.map}
           region={this.state.region}>
-          {
-            map(this.state.challenges, (challenge) => (
+          {map(this.state.challenges, (challenge) => {
+            // console.log('challenge', challenge)
+            return (
               <MapView.Marker
                 key={challenge.id}
                 onPress={this.onChallengePress.bind(this, challenge)}
@@ -271,8 +317,8 @@ class Home extends Component<void, PropsType, StateType> {
                   challenge={challenge}
                   selectedChallengeId={this.state.selectedChallenge && this.state.selectedChallenge.id} />
               </MapView.Marker>
-            ))
-          }
+            )
+          })}
           {this.state.selectedChallenge
           ? (
             <MapView.Circle

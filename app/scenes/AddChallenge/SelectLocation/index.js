@@ -12,6 +12,7 @@ import RNFS from 'react-native-fs'
 import ObjectId from 'bson-objectid'
 import doneIcon from '../../../images/ic_save_white_24dp.png'
 import Auth from '../../../auth'
+import Geofire from 'geofire'
 
 type Region = {
   latitude: number,
@@ -61,13 +62,13 @@ class SelectLocationScreen extends Component<void, PropsType, StateType> {
     position: {},
     progress: false,
     selectedLocation: {
-      latitude: 37.78825,
-      longitude: -122.4324
+      latitude: 49.2038,
+      longitude: 16.5936
     },
     selectedLocationRadius: 50,
     region: {
-      latitude: 37.78825,
-      longitude: -122.4324,
+      latitude: 49.2038,
+      longitude: 16.5936,
       latitudeDelta: 0.015,
       longitudeDelta: 0.0121
     }
@@ -110,9 +111,10 @@ class SelectLocationScreen extends Component<void, PropsType, StateType> {
       if (!profile) {
         return Promise.resolve(true)
       }
-      return firebase.database()
-      .ref(`challenges/${oid}`)
-      .set({
+      const ref = firebase.database().ref(`challenges/${oid}`)
+      const geoRef = firebase.database().ref()
+      const geofire = new Geofire(geoRef)
+      return ref.set({
         ...this.props.challengeData,
         createdBy: profile.id,
         id: oid,
@@ -121,6 +123,19 @@ class SelectLocationScreen extends Component<void, PropsType, StateType> {
           ...this.state.selectedLocation,
           radiusInMeters: this.state.selectedLocationRadius
         }
+      })
+      .then(() => {
+        return geofire.set(oid, [
+          this.state.selectedLocation.latitude,
+          this.state.selectedLocation.longitude
+        ])
+      })
+      .then((res) => {
+        console.log('grofire set', res)
+        return true
+      })
+      .catch((err) => {
+        console.log(err)
       })
     })
   }

@@ -20,6 +20,7 @@
     "@remobile/react-native-toast": "^1.0.6",
     "bson-objectid": "^1.1.5",
     "firebase": "^3.7.5",
+    "geofire": "^4.1.2",
     "lodash": "^4.17.4",
     "material-colors": "^1.2.5",
     "native-base": "2.1.0",

@@ -1789,6 +1789,11 @@
       "resolved": "https://registry.npmjs.org/generate-object-property/-/generate-object-property-1.2.0.tgz",
       "dev": true
     },
+    "geofire": {
+      "version": "4.1.2",
+      "from": "geofire@latest",
+      "resolved": "https://registry.npmjs.org/geofire/-/geofire-4.1.2.tgz"
+    },
     "get-caller-file": {
       "version": "1.0.2",
       "from": "get-caller-file@>=1.0.1 <2.0.0",
