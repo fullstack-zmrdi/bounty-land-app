@@ -1,6 +1,6 @@
+/* @flow */
 import * as firebase from 'firebase'
 
-/* @flow */
 import { AccessToken, GraphRequest, GraphRequestManager, LoginManager } from 'react-native-fbsdk'
 import { AsyncStorage, DeviceEventEmitter, Platform } from 'react-native' //eslint-disable-line
 import type { AuthData, Profile, User } from './typedef'
@@ -83,17 +83,14 @@ class Auth {
   // Save user info to firebase if not already stored
   saveUser (authData: AuthData): Promise<any> {
     if (!authData || !authData.user) {
-      // console.log('no data')
       return Promise.resolve(false)
     } else if (authData.user && (authData.type === LOGIN_TYPES.facebook || authData.type === LOGIN_TYPES.google)) {
       const userId = authData.user.id
       const ref = firebase.database().ref(`users/${userId}`)
-      return ref.once('value', (snapshot) => {
+      return ref.once('value', (snapshot: Object) => {
         if (snapshot.exists()) {
-          // console.log('user exists', authData.user.id)
           return ref.update({ lastLogin: Date.now() })
         }
-        // console.log('saving user', authData.user.id)
         return ref.set({ type: authData.type, user: authData.user, lastLogin: Date.now() })
       })
     }
@@ -168,10 +165,10 @@ class Auth {
       this.setAuthData(authData)
       return authData
     })
-    .then((authData) => {
+    .then((authData: AuthData) => {
       return this.saveUser(authData)
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       console.log('facebook sign in err', err)
       return null
     })
@@ -184,7 +181,7 @@ class Auth {
     .then(() => {
       return GoogleSignin.signIn()
     })
-    .then((user) => {
+    .then((user: Object) => {
       // console.log('google sign in', user)
       const authData = { isAuthenticated: true, type: LOGIN_TYPES.google, user }
       this.setAuthData(authData)
@@ -193,7 +190,7 @@ class Auth {
     .then((authData: AuthData) => {
       return this.saveUser(authData)
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       console.log('google sign in err', err)
       return null
     })
@@ -208,33 +205,30 @@ class Auth {
         this.setAuthData(_authData)
       }
 
-      // console.log('auth data', authData)
-
       if (authData.type === LOGIN_TYPES.facebook) {
         this.signOutFacebook()
       } else {
         this.signOutGoogle()
       }
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       console.log('sign out err', err)
     })
   }
 
-  signOutFacebook () {
+  signOutFacebook (): void {
     LoginManager.logOut()
     const authData = { isAuthenticated: false, type: LOGIN_TYPES.facebook }
     this.setAuthData(authData)
   }
 
-  signOutGoogle () {
+  signOutGoogle (): void {
     GoogleSignin.signOut()
     .then(() => {
-      // console.log('google sign out succ')
       const authData = { isAuthenticated: false, type: LOGIN_TYPES.google }
       this.setAuthData(authData)
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       console.log('google sign out err', err)
     })
   }

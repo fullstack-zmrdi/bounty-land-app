@@ -19,7 +19,7 @@ import RaiseBountyModal from './ChallengeDetail/RaiseBounty'
 import SignIn from './SignIn'
 import Wallet from './Wallet'
 
-export const registerScreens = () => {
+export const registerScreens = (): void => {
   Navigation.registerComponent('SIGN_IN', () => SignIn)
   Navigation.registerComponent('PROFILE', () => Profile)
   Navigation.registerComponent('DRAWER', () => Drawer)

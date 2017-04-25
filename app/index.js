@@ -1,9 +1,6 @@
  /* @flow */
-
 import * as firebase from 'firebase'
-
 import { Platform, UIManager } from 'react-native'
-
 import Auth from './auth'
 import type { AuthData } from './typedef'
 import I18n from 'react-native-i18n'
@@ -14,8 +11,8 @@ import { firebaseConfig } from './config'
 import { iconsLoaded } from './images/Icons'
 import { registerScreens } from './scenes'
 
-const DEFAULT_LOCALE = I18n.locale.split('-')[0]
-const handleMissing = (scope) => `${scope || 'unknown'}`
+const DEFAULT_LOCALE: string = I18n.locale.split('-')[0]
+const handleMissing = (scope: string): string => `${scope || 'unknown'}`
 
 // $FlowFixMe: this is just development option
 console.disableYellowBox = true
@@ -35,14 +32,14 @@ class App {
       Auth.getAuthData(),
       iconsLoaded
     ])
-    .then((results) => {
+    .then((results: Array<Object>): void => {
       const [ authData ] = results
       // console.log('initial auth data', authData)
       this.authData = authData
       this.startApp(authData)
     })
 
-    Auth.listenAuthChange((authData: AuthData) => {
+    Auth.listenAuthChange((authData: AuthData): void => {
       // console.log('auth change', authData)
       if (!this.authData || (this.authData.isAuthenticated !== authData.isAuthenticated)) {
         this.startApp(authData)
@@ -56,7 +53,7 @@ class App {
   /**
    * Start app
    */
-  startApp (authData: AuthData) {
+  startApp (authData: AuthData): void {
     if (!authData || !authData.isAuthenticated) {
       // console.log('start app dont have user')
       this.startAppAsUnauthenticatedUser()
@@ -82,7 +79,7 @@ class App {
   /**
    * Start app as unauthenticated user
    */
-  startAppAsUnauthenticatedUser () {
+  startAppAsUnauthenticatedUser (): void {
     Navigation.startSingleScreenApp({
       screen: {
         screen: 'SIGN_IN',
@@ -94,7 +91,7 @@ class App {
   /**
    * Start as authenticated user ios
    */
-  startAppAsAuthenticatedUserIos (authData: Object) {
+  startAppAsAuthenticatedUserIos (authData: Object): void {
     Navigation.startTabBasedApp({
       tabs: [
         {
@@ -132,7 +129,7 @@ class App {
   /**
    * Start as authenticated user android
    */
-  startAppAsAuthenticatedUserAndroid (authData: Object) {
+  startAppAsAuthenticatedUserAndroid (authData: Object): void {
     Navigation.startSingleScreenApp({
       screen: {
         screen: 'HOME'
@@ -149,7 +146,7 @@ class App {
   /**
    * Set i18n locale
    */
-  setLocale (locale: string) {
+  setLocale (locale: string): void {
     // console.log(locale)
     I18n.locale = locale
   }
@@ -157,7 +154,7 @@ class App {
   /**
    * Configure i18n
    */
-  configureI18n () {
+  configureI18n (): void {
     I18n.fallbacks = true
     I18n.default_locale = DEFAULT_LOCALE
     I18n.available_locales = ['cs', 'en']
@@ -172,7 +169,7 @@ class App {
   /**
    * Init firebase
    */
-  initFirebase () {
+  initFirebase (): void {
     // console.log('init firebase')
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig)

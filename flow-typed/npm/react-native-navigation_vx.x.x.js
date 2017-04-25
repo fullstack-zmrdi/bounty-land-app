@@ -8,13 +8,90 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 
+type RnNavigator = {
+  push: Function,
+  pop: Function,
+  popToRoot: Function,
+  resetTo: Function,
+  showModal: Function,
+  showLightBox: Function,
+  dismissModal: Function,
+  dismissAllModals: Function,
+  showLightBox: Function,
+  dismissLightBox: Function,
+  showInAppNotification: Function,
+  dismissInAppNotification: Function,
+  setButtons: Function,
+  setTitle: Function,
+  setSubTitle: Function,
+  setTitleImage: Function,
+  setStyle: Function,
+  toggleDrawer: Function,
+  toggleTabs: Function,
+  toggleNavBar: Function,
+  setTabBadge: Function,
+  switchToTab: Function,
+  showSnackbar: Function,
+  dismissSnackbar: Function,
+  showContextualMenu: Function,
+  dismissContextualMenu: Function,
+  setOnNavigatorEvent: Function,
+  handleDeepLink: Function,
+  onNavigatorEvent: Function,
+  cleanup: Function
+};
+
 declare module 'react-native-navigation' {
-  declare module.exports: any;
+  declare type ScreenOptions = {
+    screen: string,
+    title?: string,
+    passProps?: Object,
+    navigatorStyle?: Object,
+    navigatorButtons?: Object
+  };
+  declare type TabOptions = {
+    label?: string,
+    icon?: any
+  } & ScreenOptions;
+
+  declare type TabBasedAppOptions = {
+    tabs: Array<TabOptions>,
+    tabsStyle?: Object,
+    appStyle?: Object,
+    passProps?: Object,
+    animationType?: string
+  };
+
+  declare type SingleScreenAppOptions = {
+    screen: ScreenOptions
+  };
+
+  declare type NavigationType = {
+    startSingleScreenApp(screenOptions: SingleScreenAppOptions):void,
+    startTabBasedApp(tabAppOptions: TabBasedAppOptions):void,
+    registerComponent(screenID: string, generator: Function, store?: Object, Provider?: Function, options?: Object):Function,
+    getRegisteredScreen: Function,
+    showModal: Function,
+    dismissModal: Function,
+    dismissAllModals: Function,
+    showSnackbar: Function,
+    showLightBox: Function,
+    dismissLightBox: Function,
+    showInAppNotification: Function,
+    dismissInAppNotification: Function,
+    setEventHandler: Function,
+    clearEventHandler: Function,
+    handleDeepLink: Function
+  };
+
+  declare var exports: {
+    Navigation: NavigationType
+  };
 }
 
 /**

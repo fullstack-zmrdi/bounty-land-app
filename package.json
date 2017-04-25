@@ -6,6 +6,7 @@
     "start": "node_modules/react-native/packager/packager.sh",
     "lint": "node_modules/.bin/standard",
     "flow": "node_modules/.bin/flow",
+    "flow:coverage": "./node_modules/.bin/flow-coverage-report -i 'app/**/*.js' -f 'node_modules/.bin/flow'",
     "test": "node_modules/.bin/jest",
     "clean": "rm -fr $TMPDIR/react-* && watchman watch-del-all",
     "bundle:android": "./scripts/bundle.sh android",
@@ -43,8 +44,9 @@
     "babel-eslint": "^7.2.2",
     "babel-jest": "19.0.0",
     "babel-preset-react-native": "1.9.1",
-    "eslint-plugin-flowtype": "^2.30.4",
+    "eslint-plugin-flowtype": "^2.32.1",
     "flow-bin": "^0.38.0",
+    "flow-coverage-report": "https://registry.npmjs.org/flow-coverage-report/-/flow-coverage-report-0.3.0.tgz",
     "jest": "19.0.2",
     "react-test-renderer": "^15.4.2",
     "standard": "^10.0.1"
@@ -60,7 +62,8 @@
     "globals": [
       "fetch",
       "__DEV__",
-      "it"
+      "it",
+      "RnNavigator"
     ],
     "ignore": [
       ".vscode",

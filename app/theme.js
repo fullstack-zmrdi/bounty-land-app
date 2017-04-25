@@ -1,3 +1,4 @@
+/* @flow */
 import colors from 'material-colors'
 
 export const navigatorStyle = {

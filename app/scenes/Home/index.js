@@ -4,7 +4,7 @@ import * as firebase from 'firebase'
 import { Platform, StatusBar, StyleSheet, Image, View, Text, /* LayoutAnimation, */ ActivityIndicator, Animated } from 'react-native'
 import React, { Component } from 'react'
 import LinearGradient from 'react-native-linear-gradient'
-import { DeckSwiper, Card, CardItem, Left, Thumbnail, Body, H1, H3 } from 'native-base'
+import { H3 } from 'native-base'
 import type { Challenge } from '../../typedef'
 import { themeColors, categoryColors } from '../../theme'
 import Cover from '../ChallengeDetail/Cover'
@@ -23,18 +23,20 @@ import Swiper from 'react-native-swiper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 type PropsType = {
-  navigator: Object
+  navigator: RnNavigator
 }
 
 type StateType = {
   challenges: { [key: string]: Challenge},
   region: Object,
   userLatLng: ?{ latitude: number, longitude: number },
-  selectedChallenge: ?Challenge
+  selectedChallenge: ?Challenge,
+  swiperPosition: Animated.Value
 }
 
 class Home extends Component<void, PropsType, StateType> {
   geofire: Geofire;
+  swiper: Swiper;
   static navigatorStyle = {
     ...Platform.select({
       ios: {
@@ -65,7 +67,6 @@ class Home extends Component<void, PropsType, StateType> {
       android: {}
     })
   }
-  currentIndex  = 0
   state = {
     selectedChallenge: null,
     userLatLng: null,
@@ -180,9 +181,9 @@ class Home extends Component<void, PropsType, StateType> {
     }
   }
 
-  _onMomentumScrollEnd(e, state, context) {
+  _onMomentumScrollEnd (e, state, context) {
     const challengeId = Object.keys(this.state.challenges)[state.index]
-    this.setState({ selectedChallenge: this.state.challenges[challengeId]})
+    this.setState({ selectedChallenge: this.state.challenges[challengeId] })
     this.state.region.setValue({
       ...this.state.challenges[challengeId].location,
       latitudeDelta: 0.015,
@@ -301,23 +302,9 @@ class Home extends Component<void, PropsType, StateType> {
   }
 
   toggleSwiper (visible: bool): void {
-    if (visible) {
-        Animated.timing(                            // Animate value over time
-        this.state.swiperPosition,                      // The value to drive
-        {
-          toValue: 0,
-          duration: 500                        // Animate to final value of 1
-        }
-      ).start();
-    } else {
-      Animated.timing(                            // Animate value over time
-        this.state.swiperPosition,                      // The value to drive
-        {
-          toValue: -220,
-          duration: 500                            // Animate to final value of 1
-        }
-      ).start();
-    }
+    const toValue = visible ? 0 : -220
+    const anim = Animated.timing(this.state.swiperPosition, { toValue, duration: 500 })
+    anim.start()
   }
 
   render () {
@@ -373,7 +360,7 @@ class Home extends Component<void, PropsType, StateType> {
         <Animated.View style={{ position: 'absolute', paddingVertical: 16, bottom: this.state.swiperPosition, height: 240, left: 0, right: 0 }}>
           <Swiper
             onMomentumScrollEnd={this._onMomentumScrollEnd.bind(this)}
-            ref={(ref) => {this.swiper = ref}}
+            ref={(ref) => { this.swiper = ref }}
             loop >
             {map(this.state.challenges, (item) => {
               const challengeLatLng = [item.location.latitude, item.location.longitude]
@@ -382,31 +369,31 @@ class Home extends Component<void, PropsType, StateType> {
               return (
                 <View style={{ flex: 1, paddingHorizontal: 8, flexDirection: 'column', justifyContent: 'space-between' }}>
                   <View style={{ flex: 1, backgroundColor: colors.white, elevation: 3, borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
-                    <Image source={{ uri: item.photo}} style={{ height: 240, position: 'absolute', left: 0, right: 0,  resizeMode: 'cover'}}/>
-                    <LinearGradient colors={[themeColors.primaryColorDark,'rgba(255,255,255,0)']} style={{ height: 240, paddingVertical: 8, borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
+                    <Image source={{ uri: item.photo }} style={{ height: 240, position: 'absolute', left: 0, right: 0, resizeMode: 'cover' }} />
+                    <LinearGradient colors={[themeColors.primaryColorDark, 'rgba(255,255,255,0)']} style={{ height: 240, paddingVertical: 8, borderTopLeftRadius: 4, borderTopRightRadius: 4 }}>
                       <View style={{ paddingBottom: 8, paddingHorizontal: 16, backgroundColor: themeColors.primaryColorDark, flexDirection: 'row', marginBottom: 16, justifyContent: 'space-between', alignItems: 'center' }}>
                         <View>
                           <H3 style={{ color: colors.lightText.primary, fontWeight: 'bold' }}>{item.name}</H3>
-                          <Text style={{ color: colors.lightText.secondary}}>{I18n.t(item.category)}</Text>
+                          <Text style={{ color: colors.lightText.secondary }}>{I18n.t(item.category)}</Text>
                         </View>
-                        <Text style={{ fontSize: 24, color: colors.white, justifyContent: 'center'}}>
-                          <Icon size={24} name="md-navigate" color={colors.white} />
+                        <Text style={{ fontSize: 24, color: colors.white, justifyContent: 'center' }}>
+                          <Icon size={24} name='md-navigate' color={colors.white} />
                           {' '}{distance.toFixed(1)}km
                         </Text>
                       </View>
-                      <View style={{ marginBottom: 16, paddingHorizontal: 16,  }}>
-                        <Text style={{ fontSize: 16, color: colors.lightText.primary}}>
-                          <Text style={{ fontWeight: 'bold'}}>{(item.participants && item.participants.length) || 0}</Text>
+                      <View style={{ marginBottom: 16, paddingHorizontal: 16 }}>
+                        <Text style={{ fontSize: 16, color: colors.lightText.primary }}>
+                          <Text style={{ fontWeight: 'bold' }}>{(item.participants && item.participants.length) || 0}</Text>
                           {' '}
-                          {I18n.t('n_participants', { count: (item.participants && item.participants.length) || 0}) }
+                          {I18n.t('n_participants', {count: (item.participants && item.participants.length) || 0}) }
                         </Text>
-                        <Text style={{ fontSize: 16, color: colors.lightText.primary}}>
-                          <Text style={{ fontWeight: 'bold'}}>{item.bounty}$</Text>
+                        <Text style={{ fontSize: 16, color: colors.lightText.primary }}>
+                          <Text style={{ fontWeight: 'bold' }}>{item.bounty}$</Text>
                           {' '}
                           {I18n.t('total_bounty') }
                         </Text>
                       </View>
-                      <Text style={{ paddingHorizontal: 16, color: colors.lightText.secondary}}>{item.description}</Text>
+                      <Text style={{ paddingHorizontal: 16, color: colors.lightText.secondary }}>{item.description}</Text>
                     </LinearGradient>
                   </View>
                 </View>

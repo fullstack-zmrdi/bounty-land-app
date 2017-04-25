@@ -12,7 +12,9 @@ export type User = {
   name: string,
   email: string,
   id: string,
-  picture?: Object,
+  picture?: {
+    data: { url: string }
+  },
   photo?: string
 }
 
