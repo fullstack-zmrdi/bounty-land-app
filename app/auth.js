@@ -87,11 +87,15 @@ class Auth {
     } else if (authData.user && (authData.type === LOGIN_TYPES.facebook || authData.type === LOGIN_TYPES.google)) {
       const userId = authData.user.id
       const ref = firebase.database().ref(`users/${userId}`)
-      return ref.once('value', (snapshot: Object) => {
-        if (snapshot.exists()) {
-          return ref.update({ lastLogin: Date.now() })
-        }
-        return ref.set({ type: authData.type, user: authData.user, lastLogin: Date.now() })
+      return new Promise((resolve, reject) => {
+        ref.once('value', (snapshot) => {
+          if (snapshot.exists()) {
+            return ref.update({ lastLogin: Date.now() })
+            .then(resolve)
+          }
+          return ref.set({ type: authData.type, user: authData.user, lastLogin: Date.now() })
+          .then(resolve)
+        })
       })
     }
     return Promise.resolve(false)

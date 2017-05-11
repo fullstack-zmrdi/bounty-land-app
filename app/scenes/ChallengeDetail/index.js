@@ -1,20 +1,20 @@
 /* @flow */
 import * as firebase from 'firebase'
 
-import { Button, Container, Content, Row, Segment, Text, getTheme } from 'native-base'
+import { Button, Container, Content, Row, Segment, Text } from 'native-base'
 import { Image, LayoutAnimation, Platform, StatusBar, StyleSheet, View } from 'react-native'
 import React, {Component} from 'react'
 
 import Auth from '../../auth'
 import Cover from './Cover'
 import I18n from 'react-native-i18n'
-import type { Profile } from '../../typedef'
+import type { Profile, Challenge } from '../../typedef'
 import colors from 'material-colors'
 import { iconsMap } from '../../images/Icons'
 
 type PropsType = {
-  navigator: Object,
-  challenge: Object
+  navigator: RnNavigator,
+  challenge: Challenge
 }
 
 type StateType = {
@@ -30,14 +30,13 @@ class ChallengeDetail extends Component<void, PropsType, StateType> {
   }
 
   componentDidMount (): void {
-    const theme = getTheme()
-    theme['NativeBase.Segment'].borderColor = colors.cyan['500']
-    console.log('native base theme', theme)
     StatusBar.setBarStyle('light-content', true)
     Auth.getProfile()
     .then((profile) => {
+      if (profile) {
+      }
       const { navigator, challenge } = this.props
-      const isLiked = challenge.likes && challenge.likes.find((likeId) => profile.id === likeId)
+      const isLiked = !!(challenge.likes && challenge.likes.find((likeId) => profile.id === likeId))
       navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this))
       navigator.setButtons({
         leftButtons: [{
@@ -103,11 +102,11 @@ class ChallengeDetail extends Component<void, PropsType, StateType> {
 
   // On participate press
   onParticipatePress (): void {
-    return Auth.getProfile()
-    .then((profile) => {
+    Auth.getProfile()
+    .then((profile: Profile) => {
       const challengeRef = firebase.database().ref(`challenges/${this.props.challenge.id}`)
       challengeRef.once('value', (snapshot) => {
-        const challenge = snapshot.val()
+        const challenge: Challenge = snapshot.val()
         this.addParticipant(profile, challenge, challengeRef)
       })
     })
@@ -128,17 +127,15 @@ class ChallengeDetail extends Component<void, PropsType, StateType> {
   // Toggle like
   onLikePress (): void {
     const ref = firebase.database().ref(`challenges/${this.props.challenge.id}`)
-    return ref.once('value', (snapshot) => {
+    ref.once('value', (snapshot) => {
       const challenge = snapshot.val()
-      // console.log('got snapshot val')
-
       if (!challenge.likes) {
         challenge.likes = []
         challenge.likeCount = 0
       }
 
-      return Auth.getProfile()
-      .then((profile) => {
+      Auth.getProfile()
+      .then((profile: Profile) => {
         if (!challenge.likes.find((userId) => userId === profile.id)) {
           this.addLike(profile, challenge, ref)
         } else {
@@ -210,7 +207,7 @@ class ChallengeDetail extends Component<void, PropsType, StateType> {
   // Load challenger info
   loadChallenger (): void {
     const ref = firebase.database().ref(`users/${this.props.challenge.createdBy}`)
-    return ref.once('value', (snapshot: Object) => {
+    return ref.once('value', (snapshot) => {
       const challenger: Object = snapshot.val()
       this.setState({ challenger })
     })
@@ -265,7 +262,7 @@ class ChallengeDetail extends Component<void, PropsType, StateType> {
   }
 
   // Render navigation segment
-  renderSegment (): Segment {
+  renderSegment (): React.Element<Segment> {
     return (
       <Segment style={StyleSheet.flatten(styles.segment)}>
         <Button first active>
@@ -279,7 +276,7 @@ class ChallengeDetail extends Component<void, PropsType, StateType> {
   }
 
   // Render description and bounty
-  renderDescriptionAndBounty (): Row {
+  renderDescriptionAndBounty (): React.Element<Row> {
     return (
       <Row style={StyleSheet.flatten(styles.descriptionContainer)}>
         <View style={{ flex: 0.65, paddingRight: 16 }}>
@@ -322,7 +319,7 @@ class ChallengeDetail extends Component<void, PropsType, StateType> {
   }
 
   // Render challenger
-  renderChallenger (): ?Row {
+  renderChallenger (): ?React.Element<Row> {
     if (this.state.challenger && this.state.challenger.user) {
       return (
         <Row style={StyleSheet.flatten([{ alignItems: 'center' }, styles.descriptionContainer])}>
@@ -348,7 +345,7 @@ class ChallengeDetail extends Component<void, PropsType, StateType> {
   }
 
   // Render footer
-  renderFooter (): ?Row {
+  renderFooter (): ?React.Element<Row> {
     if (this.state.challenger && this.state.challenger.user) {
       return (
         <Row>

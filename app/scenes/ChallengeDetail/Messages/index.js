@@ -14,11 +14,11 @@ import { iconsMap } from '../../../images/Icons'
 import map from 'lodash/map'
 import { navigatorStyle } from '../../../theme'
 
-import type { Profile } from '../../../typedef'
+import type { Profile, Challenge } from '../../../typedef'
 
 type PropsType = {
-  navigator: Object,
-  challenge: null
+  navigator: RnNavigator,
+  challenge: Challenge
 }
 
 type StateType = {

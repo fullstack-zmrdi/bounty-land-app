@@ -12,25 +12,83 @@
  * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
+type NavigatorStyleType = {
+  navBarTextColor?: string,
+  navBarBackgroundColor?: string,
+  navBarButtonColor?: string,
+  navBarHidden?: boolean,
+  navBarHideOnScroll?: boolean,
+  navBarTranslucent?: boolean,
+  navBarTransparent?: boolean,
+  topBarElevationShadowEnabled?: boolean,
+  navBarNoBorder?: boolean,
+  drawUnderNavBar?: boolean,
+  drawUnderTabBar?: boolean,
+  statusBarBlur?: boolean,
+  navBarBlur?: boolean,
+  tabBarHidden?: boolean,
+  statusBarColor?: string,
+  statusBarHideWithNavBar?: boolean,
+  statusBarHidden?: boolean,
+  statusBarTextColorScheme?: string,
+  statusBarTextColorSchemeSingleScreen?: string,
+  screenBackgroundColor?: string,
+  orientation?: string
+};
+
+type ScreenOptions = {
+  screen: string,
+  title?: string,
+  passProps?: { [key: string]: any },
+  navigatorStyle?: NavigatorStyleType,
+  navigatorButtons?: Object
+};
+
+type NavigatorButton = {
+  id: string,
+  icon?: any,
+  title?: string,
+  disabled?: boolean,
+  disableIcontint?: boolean,
+  showAction?: 'ifRoom'|'never'|'always'|'withText',
+  buttonColor?: string,
+  buttonFontSize?: number,
+  buttonFontWeight?: string,
+  testID?: string
+};
+
+type FabButton = {
+  collapsedId: string,
+  collapsedIcon?: any,
+  backgroundColor?: string,
+  expendedId?: string,
+  expendedIcon?: any,
+  actions?: Array<{ id: string, icon: any, backgroundColor: string}>
+};
+
+type NavigatorButtons = {
+  rightButtons?: Array<NavigatorButton>,
+  leftButtons?: Array<NavigatorButton>,
+  fab?: FabButton
+};
 
 type RnNavigator = {
-  push: Function,
-  pop: Function,
-  popToRoot: Function,
+  push(options: ScreenOptions):void,
+  pop():void,
+  popToRoot():void,
   resetTo: Function,
-  showModal: Function,
+  showModal(options: ScreenOptions):void,
   showLightBox: Function,
-  dismissModal: Function,
-  dismissAllModals: Function,
-  showLightBox: Function,
-  dismissLightBox: Function,
+  dismissModal():void,
+  dismissAllModals():void,
+  dismissLightBox():void,
   showInAppNotification: Function,
   dismissInAppNotification: Function,
-  setButtons: Function,
-  setTitle: Function,
+  setButtons(options: NavigatorButtons):void,
+  setTitle(options: { title: string }):void,
   setSubTitle: Function,
   setTitleImage: Function,
-  setStyle: Function,
+  setStyle(options: NavigatorStyleType):void,
   toggleDrawer: Function,
   toggleTabs: Function,
   toggleNavBar: Function,
@@ -40,20 +98,13 @@ type RnNavigator = {
   dismissSnackbar: Function,
   showContextualMenu: Function,
   dismissContextualMenu: Function,
-  setOnNavigatorEvent: Function,
+  setOnNavigatorEvent(callback:Function):void,
   handleDeepLink: Function,
   onNavigatorEvent: Function,
   cleanup: Function
 };
 
 declare module 'react-native-navigation' {
-  declare type ScreenOptions = {
-    screen: string,
-    title?: string,
-    passProps?: Object,
-    navigatorStyle?: Object,
-    navigatorButtons?: Object
-  };
   declare type TabOptions = {
     label?: string,
     icon?: any

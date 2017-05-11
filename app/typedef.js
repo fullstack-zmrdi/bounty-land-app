@@ -41,5 +41,6 @@ export type Challenge = {
   bounty: number,
   endDate: string,
   supporters: Array<string>,
-  participants: Array<string>
+  participants: Array<string>,
+  likes: Array<string>
 }

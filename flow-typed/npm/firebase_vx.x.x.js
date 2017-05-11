@@ -8,13 +8,40 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 
 declare module 'firebase' {
-  declare module.exports: any;
+  declare type SnapshotType<T> = {
+    val():T,
+    exists():boolean
+  };
+  declare type RefType = {
+    on(eventName: string, callback: (snapshot: SnapshotType<any>) => void):void,
+    once(eventName: string, callback: (snapshot: SnapshotType<any>) => void):void,
+    update(payload: Object): Promise<any>,
+    set(payload: Object): Promise<any>,
+    limitToLast(count: number): RefType,
+    limitToFirst(count: number): RefType
+  };
+  declare type DatabaseType = {
+    ref(refName?: string): RefType
+  };
+  declare type FirebaseConfigType = {
+    apiKey: string,
+    authDomain: string,
+    databaseURL: string,
+    projectId: string,
+    storageBucket: string,
+    messagingSenderId: string
+  };
+  declare var exports: {
+    database(): DatabaseType,
+    initializeApp(config: FirebaseConfigType): void,
+    apps: Array<Object>
+  };
 }
 
 /**
